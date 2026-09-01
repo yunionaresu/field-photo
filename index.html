@@ -4,27 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>ROCKMAN 現場 CAMERA</title>
-
-  <!-- Google Fonts: 8bitレトロドットフォント -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>現場写真カメラ</title>
 
   <style>
     /* =========================================================
-       ファミコン / ロックマン風 8-bit カラーパレット
+       ユニバーサル & リンナイ風 クリーンカラーパレット
     ========================================================= */
     :root {
-      --nes-black: #000000;
-      --nes-white: #ffffff;
-      --rock-blue-light: #00fcfc; /* シアン */
-      --rock-blue-mid: #0078f8;   /* ロックマンブルー */
-      --rock-blue-dark: #0000a8;  /* ダークネイビー */
-      --rock-yellow: #f8b800;     /* エネルギー黄色 */
-      --rock-red: #f83800;        /* ボス赤 */
-      --pixel-font: "DotGothic16", monospace, sans-serif;
+      --bg-base: #f1f5f9;
+      --surface: #ffffff;
+      --brand-red: #e60012;       /* リンナイレッド */
+      --brand-red-dark: #c00010;
+      --text-main: #0f172a;       /* 高コントラスト黒 */
+      --text-sub: #475569;
+      --border-color: #cbd5e1;
+      --border-focus: #94a3b8;
+      --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+      --font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
     }
 
     * {
@@ -34,61 +31,21 @@
       padding: 0;
       user-select: none;
       -webkit-user-select: none;
-      image-rendering: pixelated;
     }
 
     html, body {
       width: 100%;
       height: 100%;
-      background: var(--nes-black);
-      color: var(--nes-white);
-      font-family: var(--pixel-font);
+      background: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-family);
       overflow: hidden;
       overscroll-behavior: none;
-      font-size: 14px;
+      font-size: 16px; /* 視認性の高い基本サイズ */
     }
 
     body {
       touch-action: manipulation;
-    }
-
-    /* ロックマン風 2重ピクセルボーダー */
-    .nes-box {
-      background: var(--nes-black);
-      border: 4px solid var(--nes-white);
-      box-shadow:
-        0 0 0 2px var(--nes-black),
-        inset 0 0 0 2px var(--rock-blue-mid);
-      position: relative;
-    }
-
-    /* ピクセルボタン */
-    .nes-btn {
-      background: var(--rock-blue-dark);
-      color: var(--nes-white);
-      border: 3px solid var(--nes-white);
-      box-shadow: inset -3px -3px 0px 0px rgba(0,0,0,0.6), inset 3px 3px 0px 0px var(--rock-blue-light);
-      font-family: var(--pixel-font);
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 6px 10px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      outline: none;
-    }
-    .nes-btn:active {
-      transform: scale(0.96);
-      background: var(--rock-blue-mid);
-    }
-    .nes-btn.active, .nes-btn.selected {
-      background: var(--rock-yellow);
-      color: var(--nes-black);
-      border-color: var(--nes-white);
-      box-shadow: inset -3px -3px 0px 0px #885500, inset 3px 3px 0px 0px #fff;
     }
 
     #app {
@@ -96,47 +53,72 @@
       height: 100dvh;
       display: flex;
       flex-direction: column;
-      background: #000020;
-      padding: 6px;
-      gap: 6px;
     }
 
-    /* ヘッダー */
+    /* =========================================================
+       ヘッダー
+    ========================================================= */
     .header {
-      height: 48px;
-      padding: 0 10px;
+      height: 56px;
+      padding: 0 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      background: var(--surface);
+      border-bottom: 2px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
       flex-shrink: 0;
-      background: var(--rock-blue-dark);
+      z-index: 10;
     }
-    .title {
-      font-size: 15px;
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.15rem;
       font-weight: 700;
-      color: var(--rock-blue-light);
-      text-shadow: 2px 2px 0px var(--nes-black);
+      letter-spacing: -0.02em;
+    }
+    .header-logo .red-mark {
+      width: 5px;
+      height: 20px;
+      background: var(--brand-red);
+      border-radius: 2px;
+    }
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .header-tile-btn {
+      height: 38px;
+      padding: 0 12px;
+      border-radius: 8px;
+      background: #f8fafc;
+      border: 1.5px solid var(--border-color);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      font-weight: 700;
       display: flex;
       align-items: center;
       gap: 6px;
+      cursor: pointer;
     }
-    .header-right {
-      display: flex;
-      gap: 6px;
-    }
-    .header-btn {
-      height: 32px;
-      padding: 0 8px;
-      font-size: 12px;
+    .header-tile-btn:active {
+      background: #e2e8f0;
     }
 
-    /* カメラファインダー */
+    /* =========================================================
+       カメラステージ（ファインダー）
+    ========================================================= */
     #cameraStage {
       position: relative;
       flex: 1;
       min-height: 0;
-      background: var(--nes-black);
+      margin: 10px 12px 6px;
+      background: #000;
+      border-radius: 14px;
       overflow: hidden;
+      border: 2px solid #cbd5e1;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2), var(--card-shadow);
       touch-action: none;
     }
     #video {
@@ -148,7 +130,7 @@
       pointer-events: none;
     }
 
-    /* 起動・エラーダイアログ */
+    /* 起動画面・エラー */
     #cameraStart, #cameraError {
       position: absolute;
       inset: 0;
@@ -156,177 +138,261 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
-      background: rgba(0, 0, 0, 0.85);
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(4px);
     }
-    .dialog-inner {
+    .card-dialog {
       width: 100%;
       max-width: 320px;
-      padding: 20px 14px;
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 24px 20px;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
 
-    /* スタンプ（ピクセルバッジ） */
+    /* スタンプ（視認性バッジ） */
     #stampPreview {
       position: absolute;
       z-index: 8;
       display: none;
-      padding: 6px 12px;
-      border: 3px solid var(--nes-white);
-      background: var(--nes-black);
-      color: var(--rock-blue-light);
-      font-size: 16px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.85);
+      border: 2px solid #ffffff;
+      color: #ffffff;
+      font-size: 1.05rem;
       font-weight: 700;
-      box-shadow: 3px 3px 0px var(--nes-black);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
       pointer-events: none;
       white-space: nowrap;
     }
 
-    /* ★ 修正済み: 一体型SVG矢印プレビュー */
+    /* ★ ズレない精密SVG矢印 */
     #arrowPreview {
       position: absolute;
       z-index: 9;
       display: none;
-      width: 80px;
-      height: 80px;
+      width: 86px;
+      height: 86px;
       pointer-events: none;
-      /* 中心ではなく、矢じり先端(右上)がターゲットに合うようオフセット */
       transform: translate(-70%, -20%);
     }
     .arrow-svg {
       width: 100%;
       height: 100%;
-      filter: drop-shadow(2px 2px 0px #000);
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.6));
     }
 
-    /* 下部コントロール */
+    /* =========================================================
+       下部タイルコントロールパネル
+    ========================================================= */
     .controls-panel {
-      padding: 8px;
+      background: var(--surface);
+      border-top: 2px solid #e2e8f0;
+      padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       flex-shrink: 0;
-      background: var(--rock-blue-dark);
-      padding-bottom: calc(8px + env(safe-area-inset-bottom));
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.03);
     }
 
-    .tools-grid {
+    /* ステータス選択タイル */
+    .tiles-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 5px;
+      gap: 8px;
+    }
+    .tile-btn {
+      height: 48px;
+      background: #f8fafc;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.1s ease;
+    }
+    .tile-btn:active {
+      transform: scale(0.97);
+    }
+    /* 選択中（リンナイレッド＋白文字） */
+    .tile-btn.active {
+      background: var(--brand-red);
+      border-color: var(--brand-red);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(230, 0, 18, 0.35);
     }
 
+    /* シャッターボタン（大型ユニバーサルデザイン） */
     .shutter-btn {
       width: 100%;
-      height: 52px;
-      background: var(--rock-blue-mid);
-      color: var(--nes-white);
-      border: 4px solid var(--nes-white);
-      font-size: 17px;
-      letter-spacing: 2px;
-      box-shadow: inset -4px -4px 0px 0px #000060, inset 4px 4px 0px 0px var(--rock-blue-light);
+      height: 54px;
+      background: #0f172a;
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
     }
     .shutter-btn:active {
-      background: var(--rock-yellow);
-      color: var(--nes-black);
-      box-shadow: inset -4px -4px 0px 0px #885500, inset 4px 4px 0px 0px #fff;
+      background: #1e293b;
+      transform: scale(0.98);
+    }
+    .shutter-btn .red-dot {
+      width: 12px;
+      height: 12px;
+      background: var(--brand-red);
+      border-radius: 50%;
     }
 
-    /* 全画面モーダル */
-    .nes-modal {
+    /* =========================================================
+       モーダル（ギャラリー・設定）
+    ========================================================= */
+    .modal-overlay {
       position: fixed;
       inset: 0;
       z-index: 100;
       display: none;
       flex-direction: column;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
       padding: 10px;
     }
-    .nes-modal.show { display: flex; }
+    .modal-overlay.show { display: flex; }
 
-    .modal-frame {
+    .modal-card {
       flex: 1;
+      background: var(--surface);
+      border-radius: 16px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.2);
     }
 
     .modal-header {
-      height: 46px;
-      padding: 0 10px;
+      height: 56px;
+      padding: 0 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--rock-blue-dark);
-      border-bottom: 3px solid var(--nes-white);
+      border-bottom: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+    }
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .modal-body {
       flex: 1;
       overflow-y: auto;
-      padding: 10px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    /* ギャラリーアイテム */
-    .photo-row {
+    /* ギャラリー写真カード */
+    .photo-tile-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px;
-      background: #000030;
-      border: 2px solid var(--rock-blue-mid);
+      gap: 12px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
     }
-    .photo-thumb {
-      width: 64px;
-      height: 64px;
+    .photo-tile-thumb {
+      width: 68px;
+      height: 68px;
+      border-radius: 8px;
       object-fit: cover;
-      border: 2px solid var(--nes-white);
+      border: 1px solid var(--border-color);
     }
 
     .modal-bottom {
-      padding: 10px;
-      background: var(--rock-blue-dark);
-      border-top: 3px solid var(--nes-white);
+      padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+      border-top: 1.5px solid #e2e8f0;
+      background: #f8fafc;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      gap: 10px;
     }
 
-    .nes-input {
+    /* 入力フォーム */
+    .clean-input {
       width: 100%;
-      height: 42px;
-      padding: 0 10px;
-      background: var(--nes-black);
-      color: var(--rock-yellow);
-      border: 3px solid var(--nes-white);
-      font-family: var(--pixel-font);
-      font-size: 15px;
+      height: 48px;
+      padding: 0 14px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-main);
       outline: none;
+      background: #ffffff;
+    }
+    .clean-input:focus {
+      border-color: var(--brand-red);
+    }
+
+    .btn-action-primary {
+      height: 50px;
+      background: var(--brand-red);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 10px rgba(230, 0, 18, 0.3);
+    }
+    .btn-action-primary:active {
+      background: var(--brand-red-dark);
     }
 
     /* トーストメッセージ */
     #message {
       position: fixed;
       left: 50%;
-      bottom: 140px;
+      bottom: 150px;
       transform: translateX(-50%);
       z-index: 200;
       display: none;
-      padding: 8px 16px;
-      background: var(--nes-black);
-      color: var(--rock-yellow);
-      border: 3px solid var(--nes-white);
-      box-shadow: 4px 4px 0px #000;
-      font-size: 14px;
-      text-align: center;
+      padding: 10px 22px;
+      border-radius: 30px;
+      background: rgba(15, 23, 42, 0.92);
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
       white-space: nowrap;
     }
   </style>
@@ -337,134 +403,153 @@
 <div id="app">
 
   <!-- ヘッダー -->
-  <header class="header nes-box">
-    <div class="title">
-      <span>⚡</span> ROCK-CAM <span>STAGE</span>
+  <header class="header">
+    <div class="header-logo">
+      <div class="red-mark"></div>
+      <span>現場写真カメラ</span>
     </div>
-    <div class="header-right">
-      <button class="nes-btn header-btn" id="galleryButton">ITEM (<span id="photoCount">0</span>)</button>
-      <button class="nes-btn header-btn" id="settingsButton">OPT</button>
+    <div class="header-actions">
+      <button class="header-tile-btn" id="galleryButton">
+        📁 写真一覧 (<span id="photoCount" style="color:var(--brand-red);">0</span>)
+      </button>
+      <button class="header-tile-btn" id="settingsButton" style="padding:0 10px;">
+        ⚙️
+      </button>
     </div>
   </header>
 
   <!-- カメラファインダー -->
-  <main id="cameraStage" class="nes-box">
+  <main id="cameraStage">
     <video id="video" autoplay playsinline webkit-playsinline muted></video>
 
     <!-- 起動画面 -->
     <div id="cameraStart">
-      <div class="dialog-inner nes-box">
-        <div style="font-size:32px; color:var(--rock-blue-light);">READY!</div>
-        <p style="line-height:1.6; font-size:13px;">現場カメラシステムヲ<br>キドウシテクダサイ</p>
-        <button class="nes-btn" id="startCameraButton" style="padding:10px 20px; font-size:15px;">START (カメラ起動)</button>
+      <div class="card-dialog">
+        <div style="font-size:2.4rem;">📷</div>
+        <h2 style="font-size:1.25rem;">カメラを起動します</h2>
+        <p style="color:var(--text-sub); font-size:0.9rem; line-height:1.5;">
+          現場撮影を開始するには<br>カメラアクセスを許可してください
+        </p>
+        <button class="btn-action-primary" id="startCameraButton" style="width:100%; height:46px; margin-top:6px;">
+          カメラを起動する
+        </button>
       </div>
     </div>
 
     <!-- エラー画面 -->
     <div id="cameraError">
-      <div class="dialog-inner nes-box">
-        <div style="font-size:24px; color:var(--rock-red);">WARNING!</div>
-        <p id="cameraErrorText" style="line-height:1.6; font-size:12px;"></p>
-        <button class="nes-btn" id="retryButton">RETRY (再試行)</button>
+      <div class="card-dialog">
+        <div style="font-size:2.2rem; color:var(--brand-red);">⚠️</div>
+        <h2 style="font-size:1.15rem; color:var(--brand-red);">カメラ起動エラー</h2>
+        <p id="cameraErrorText" style="color:var(--text-sub); font-size:0.85rem;"></p>
+        <button class="btn-action-primary" id="retryButton" style="width:100%; height:44px;">
+          再試行する
+        </button>
       </div>
     </div>
 
     <!-- スタンプ -->
     <div id="stampPreview"></div>
 
-    <!-- ★ 一体型SVG矢印プレビュー（ズレ・分裂ゼロ） -->
+    <!-- ★ 精密SVG矢印（ズレ・分裂ゼロ） -->
     <div id="arrowPreview">
       <svg viewBox="0 0 100 100" class="arrow-svg">
-        <!-- 白フチ -->
         <line x1="20" y1="80" x2="72" y2="28" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
-        <!-- 赤の本体軸線 -->
-        <line x1="20" y1="80" x2="72" y2="28" stroke="#f83800" stroke-width="8" stroke-linecap="round"/>
-        <!-- 矢じり三角形（白枠付き赤） -->
-        <polygon points="50,15 90,10 85,50" fill="#f83800" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round"/>
+        <line x1="20" y1="80" x2="72" y2="28" stroke="#e60012" stroke-width="8" stroke-linecap="round"/>
+        <polygon points="50,15 90,10 85,50" fill="#e60012" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round"/>
       </svg>
     </div>
   </main>
 
-  <!-- 操作パネル -->
-  <section class="controls-panel nes-box">
-    <div class="tools-grid">
-      <button class="nes-btn toolButton" data-stamp="作業前">作業前</button>
-      <button class="nes-btn toolButton" data-stamp="作業中">作業中</button>
-      <button class="nes-btn toolButton" data-stamp="作業後">作業後</button>
-      <button class="nes-btn toolButton" id="arrowButton">➔ 矢印</button>
+  <!-- 操作タイルパネル -->
+  <section class="controls-panel">
+    <!-- ステータス切替タイル -->
+    <div class="tiles-grid">
+      <button class="tile-btn toolButton" data-stamp="作業前">作業前</button>
+      <button class="tile-btn toolButton" data-stamp="作業中">作業中</button>
+      <button class="tile-btn toolButton" data-stamp="作業後">作業後</button>
+      <button class="tile-btn toolButton" id="arrowButton">➜ 矢印</button>
     </div>
 
-    <button class="nes-btn shutter-btn" id="captureButton">
-      ⚡ SHOT / 撮影
+    <!-- シャッターボタン -->
+    <button class="shutter-btn" id="captureButton">
+      <div class="red-dot"></div>
+      <span>撮影する</span>
     </button>
   </section>
 
 </div>
 
-<!-- 📁 ギャラリーウィンドウ -->
-<section id="gallery" class="nes-modal">
-  <div class="modal-frame nes-box">
+<!-- 📁 ギャラリーモーダル -->
+<section id="gallery" class="modal-overlay">
+  <div class="modal-card">
     <div class="modal-header">
-      <div style="color:var(--rock-blue-light); font-weight:bold;">📁 ITEM LIST (撮影一覧)</div>
-      <button class="nes-btn header-btn" id="closeGallery">✕</button>
+      <div class="modal-title">📁 撮影済み写真一覧</div>
+      <button class="header-tile-btn" id="closeGallery" style="height:34px; padding:0 10px;">閉じる</button>
     </div>
     
     <div class="modal-body" id="galleryList"></div>
     
     <div class="modal-bottom">
-      <input id="jobNumber" class="nes-input" type="text" placeholder="受付番号 (例: 26H0043982)">
-      <div style="display:grid; grid-template-columns: 1fr 1.6fr; gap:6px;">
-        <button class="nes-btn" id="btnSelectAllToggle">全選択/解除</button>
-        <button class="nes-btn" id="sendButton" style="background:var(--rock-yellow); color:#000;">
-          ☑ TRANSMIT (共有)
+      <label style="font-size:0.85rem; font-weight:700; color:var(--text-sub);">受付番号</label>
+      <input id="jobNumber" class="clean-input" type="text" placeholder="例: 26H0043982">
+      
+      <div style="display:grid; grid-template-columns: 1fr 1.6fr; gap:8px;">
+        <button class="tile-btn" id="btnSelectAllToggle" style="height:50px; font-size:0.95rem;">全選択/解除</button>
+        <button class="btn-action-primary" id="sendButton">
+          ☑ 選択写真を共有
         </button>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ⚙ 設定ウィンドウ -->
-<section id="settings" class="nes-modal">
-  <div class="modal-frame nes-box">
+<!-- ⚙ 設定モーダル -->
+<section id="settings" class="modal-overlay">
+  <div class="modal-card">
     <div class="modal-header">
-      <div style="color:var(--rock-blue-light); font-weight:bold;">⚙ CONFIG (設定)</div>
-      <button class="nes-btn header-btn" id="closeSettings">✕</button>
+      <div class="modal-title">⚙️ スタンプ・矢印の設定</div>
+      <button class="header-tile-btn" id="closeSettings" style="height:34px; padding:0 10px;">✕</button>
     </div>
     
-    <div class="modal-body">
-      <div style="display:flex; flex-direction:column; gap:6px;">
-        <label style="color:var(--rock-yellow);">[ スタンプ イチ ]</label>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-          <button class="nes-btn" data-position="top-left">ヒダリウエ</button>
-          <button class="nes-btn" data-position="top-right">ミギウエ</button>
-          <button class="nes-btn" data-position="bottom-left">ヒダリシタ</button>
-          <button class="nes-btn" data-position="bottom-right">ミギシタ</button>
+    <div class="modal-body" style="gap:16px;">
+      <div>
+        <label style="font-size:0.9rem; font-weight:700; color:var(--text-sub); display:block; margin-bottom:8px;">
+          作業状態スタンプの位置
+        </label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <button class="tile-btn" data-position="top-left">↖ 左上</button>
+          <button class="tile-btn" data-position="top-right">↗ 右上</button>
+          <button class="tile-btn" data-position="bottom-left">↙ 左下</button>
+          <button class="tile-btn" data-position="bottom-right">↘ 右下</button>
         </div>
       </div>
 
-      <div style="display:flex; flex-direction:column; gap:6px; margin-top:10px;">
-        <label style="color:var(--rock-yellow);">[ ヤジルシ サイズ ]</label>
-        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:4px;">
-          <button class="nes-btn" data-arrow-size="0.7">S</button>
-          <button class="nes-btn" data-arrow-size="1">M</button>
-          <button class="nes-btn" data-arrow-size="1.4">L</button>
-          <button class="nes-btn" data-arrow-size="1.8">XL</button>
+      <div>
+        <label style="font-size:0.9rem; font-weight:700; color:var(--text-sub); display:block; margin-bottom:8px;">
+          矢印の大きさ
+        </label>
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;">
+          <button class="tile-btn" data-arrow-size="0.7">小</button>
+          <button class="tile-btn" data-arrow-size="1">標準</button>
+          <button class="tile-btn" data-arrow-size="1.4">大</button>
+          <button class="tile-btn" data-arrow-size="1.8">特大</button>
         </div>
       </div>
     </div>
 
     <div class="modal-bottom">
-      <button class="nes-btn" id="closeSettingsBtn" style="width:100%;">OK (完了)</button>
+      <button class="btn-action-primary" id="closeSettingsBtn" style="width:100%;">完了</button>
     </div>
   </div>
 </section>
 
-<!-- トースト -->
+<!-- トースト通知 -->
 <div id="message"></div>
 
 <script>
 /* =========================================================
-   ロジック部（矢印バグ修正＆完全動作）
+   ロジック部（完全動作版）
 ========================================================= */
 const video = document.getElementById("video");
 const cameraStage = document.getElementById("cameraStage");
@@ -542,7 +627,7 @@ async function startCamera() {
   cameraError.style.display = "none";
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    showCameraError("カメラAPIヲ リヨウデキマセン");
+    showCameraError("カメラ機能を利用できません。");
     return;
   }
 
@@ -564,10 +649,10 @@ async function startCamera() {
     await video.play();
 
     cameraStarted = true;
-    showMessage("CAMERA READY!");
+    showMessage("カメラが起動しました");
   } catch (error) {
     console.error(error);
-    showCameraError("カメラキドウ エラー: " + error.name);
+    showCameraError("カメラ起動エラー: " + error.name);
   }
 }
 
@@ -600,7 +685,7 @@ function selectArrow() {
   document.getElementById("arrowButton").classList.add("active");
 
   if (!arrowPoint) {
-    showMessage("ガメンヲ タップシテ ヤジルシヲ ハイチ");
+    showMessage("画面をタップして矢印を配置してください");
   }
 }
 
@@ -609,7 +694,7 @@ function updateStampPreview() {
     stampPreview.style.display = "none";
     return;
   }
-  const m = 10;
+  const m = 12;
   stampPreview.style.left = "auto";
   stampPreview.style.right = "auto";
   stampPreview.style.top = "auto";
@@ -621,7 +706,7 @@ function updateStampPreview() {
   else if (stampPosition === "bottom-right") { stampPreview.style.right = m + "px"; stampPreview.style.bottom = m + "px"; }
 }
 
-/* 矢印ドラッグ操作（精密補正） */
+/* 矢印ドラッグ操作 */
 function arrowPointerDown(event) {
   const arrowButton = document.getElementById("arrowButton");
   if (!arrowButton.classList.contains("active") || !cameraStarted) return;
@@ -671,10 +756,10 @@ function updateArrowPreview() {
   arrowPreview.style.transform = `translate(-70%, -20%) scale(${arrowSize})`;
 }
 
-/* 撮影 & Canvas焼き込み（SVGと完全同期） */
+/* 撮影 & Canvas焼き込み */
 function capturePhoto() {
   if (!cameraStarted || !video.videoWidth || !video.videoHeight) {
-    showMessage("カメラ ジュンビチュウ");
+    showMessage("カメラを起動してください");
     return;
   }
 
@@ -694,7 +779,7 @@ function capturePhoto() {
   }
 
   canvas.toBlob(function(blob) {
-    if (!blob) { showMessage("ホゾン シッパイ"); return; }
+    if (!blob) { showMessage("写真の保存に失敗しました"); return; }
     photos.unshift({
       id: Date.now(),
       blob: blob,
@@ -703,7 +788,7 @@ function capturePhoto() {
       selected: true
     });
     photoCount.textContent = photos.length;
-    showMessage("GET ITEM! (保存完了)");
+    showMessage("写真を保存しました");
   }, "image/jpeg", 0.92);
 }
 
@@ -727,7 +812,7 @@ function stageToSource(stageX, stageY) {
 
 function drawStamp(ctx, label, width, height) {
   const fontSize = Math.max(38, Math.round(width * 0.038));
-  ctx.font = "bold " + fontSize + "px 'DotGothic16', monospace, sans-serif";
+  ctx.font = "bold " + fontSize + "px " + varFont();
   const pad = fontSize * 0.35;
   const textWidth = ctx.measureText(label).width;
   const boxW = textWidth + pad * 2;
@@ -740,27 +825,24 @@ function drawStamp(ctx, label, width, height) {
   else if (stampPosition === "bottom-left") { x = margin; y = height - boxH - margin; }
   else if (stampPosition === "bottom-right") { x = width - boxW - margin; y = height - boxH - margin; }
 
-  // ドット黒背景
-  ctx.fillStyle = "#000000";
+  ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
   ctx.fillRect(x, y, boxW, boxH);
-
-  // 白ピクセル枠
   ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = Math.max(4, width * 0.004);
+  ctx.lineWidth = Math.max(3, width * 0.003);
   ctx.strokeRect(x, y, boxW, boxH);
 
-  // シアン文字
-  ctx.fillStyle = "#00fcfc";
+  ctx.fillStyle = "#ffffff";
   ctx.textBaseline = "middle";
   ctx.fillText(label, x + pad, y + boxH / 2);
 }
 
-/* ★ ズレない精密矢印描画 */
+function varFont() {
+  return '-apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", sans-serif';
+}
+
 function drawArrowOnPhoto(ctx, targetX, targetY, width, height) {
   const scale = (Math.min(width, height) / 1000) * arrowSize;
   const len = 90 * scale;
-
-  // 矢じりの先端を (targetX, targetY) に一致させる
   const startX = targetX - len * 0.75;
   const startY = targetY + len * 0.75;
   const angle = Math.atan2(targetY - startY, targetX - startX);
@@ -768,7 +850,7 @@ function drawArrowOnPhoto(ctx, targetX, targetY, width, height) {
   ctx.save();
   ctx.lineCap = "round";
 
-  // 1. 白フチ外枠
+  // 白フチ外枠
   ctx.strokeStyle = "#ffffff";
   ctx.lineWidth = 14 * scale;
   ctx.beginPath();
@@ -776,17 +858,17 @@ function drawArrowOnPhoto(ctx, targetX, targetY, width, height) {
   ctx.lineTo(targetX - 8 * scale * Math.cos(angle), targetY - 8 * scale * Math.sin(angle));
   ctx.stroke();
 
-  // 2. 赤の本体軸線
-  ctx.strokeStyle = "#f83800";
+  // 赤本体
+  ctx.strokeStyle = "#e60012";
   ctx.lineWidth = 8 * scale;
   ctx.beginPath();
   ctx.moveTo(startX, startY);
   ctx.lineTo(targetX - 8 * scale * Math.cos(angle), targetY - 8 * scale * Math.sin(angle));
   ctx.stroke();
 
-  // 3. 矢じり三角形（白枠＋赤塗り）
+  // 矢じり
   const headLen = 32 * scale;
-  ctx.fillStyle = "#f83800";
+  ctx.fillStyle = "#e60012";
   ctx.strokeStyle = "#ffffff";
   ctx.lineWidth = 3.5 * scale;
   ctx.lineJoin = "round";
@@ -811,35 +893,37 @@ function renderGallery() {
   list.innerHTML = "";
 
   if (photos.length === 0) {
-    list.innerHTML = `<div style="text-align:center; padding:40px 10px; color:var(--rock-blue-light);">ITEM GA ARIMASEN</div>`;
+    list.innerHTML = `<div style="text-align:center; padding:50px 10px; color:var(--text-sub);">撮影された写真がありません</div>`;
     return;
   }
 
   photos.forEach(photo => {
     const row = document.createElement("div");
-    row.className = "photo-row";
+    row.className = "photo-tile-row";
 
     const chk = document.createElement("input");
     chk.type = "checkbox";
     chk.checked = photo.selected;
-    chk.style.transform = "scale(1.3)";
+    chk.style.width = "22px";
+    chk.style.height = "22px";
+    chk.style.accentColor = "var(--brand-red)";
     chk.addEventListener("change", () => { photo.selected = chk.checked; });
 
     const img = document.createElement("img");
-    img.className = "photo-thumb";
+    img.className = "photo-tile-thumb";
     img.src = URL.createObjectURL(photo.blob);
 
     const info = document.createElement("div");
     info.style.flex = "1";
-    info.innerHTML = `<strong style="color:var(--rock-blue-light);">${photo.stamp}</strong><br><small style="color:#aaa;">${formatTime(photo.created)}</small>`;
+    info.innerHTML = `<strong style="font-size:1.05rem;">${photo.stamp}</strong><br><small style="color:var(--text-sub);">${formatTime(photo.created)}</small>`;
 
     const delBtn = document.createElement("button");
-    delBtn.className = "nes-btn";
-    delBtn.textContent = "DEL";
-    delBtn.style.padding = "4px 8px";
-    delBtn.style.background = "var(--rock-red)";
+    delBtn.className = "header-tile-btn";
+    delBtn.textContent = "削除";
+    delBtn.style.color = "var(--brand-red)";
+    delBtn.style.height = "36px";
     delBtn.addEventListener("click", () => {
-      if (confirm("コノ写真ヲ サクジョ シマスカ？")) {
+      if (confirm("この写真を削除しますか？")) {
         photos = photos.filter(p => p.id !== photo.id);
         photoCount.textContent = photos.length;
         renderGallery();
@@ -870,7 +954,7 @@ function setStampPosition(pos) {
   localStorage.setItem("stampPosition", pos);
   updateSettingsUI();
   updateStampPreview();
-  showMessage("SETTING UPDATED!");
+  showMessage("スタンプ位置を更新しました");
 }
 
 function setArrowSize(size) {
@@ -878,15 +962,15 @@ function setArrowSize(size) {
   localStorage.setItem("arrowSize", String(size));
   updateSettingsUI();
   updateArrowPreview();
-  showMessage("SIZE UPDATED!");
+  showMessage("矢印サイズを更新しました");
 }
 
 function updateSettingsUI() {
   document.querySelectorAll("[data-position]").forEach(b => {
-    b.classList.toggle("selected", b.dataset.position === stampPosition);
+    b.classList.toggle("active", b.dataset.position === stampPosition);
   });
   document.querySelectorAll("[data-arrow-size]").forEach(b => {
-    b.classList.toggle("selected", Number(b.dataset.arrowSize) === arrowSize);
+    b.classList.toggle("active", Number(b.dataset.arrowSize) === arrowSize);
   });
 }
 
@@ -894,13 +978,13 @@ function updateSettingsUI() {
 async function sendSelectedPhotos() {
   const selected = photos.filter(p => p.selected);
   if (selected.length === 0) {
-    showMessage("ITEM WO SENTAKU SHITEKUDA-SAI");
+    showMessage("写真を選択してください");
     return;
   }
 
   const jobNumber = document.getElementById("jobNumber").value.trim();
   if (!jobNumber) {
-    showMessage("UKETSUKE-BANGO WO NYURYOKU!");
+    showMessage("受付番号を入力してください");
     return;
   }
 
@@ -916,12 +1000,12 @@ async function sendSelectedPhotos() {
   if (navigator.share && navigator.canShare && navigator.canShare({ files: files })) {
     try {
       await navigator.share({ title: subject, text: subject, files: files });
-      showMessage("TRANSMITTING...");
+      showMessage("共有メニューを開きました");
     } catch(e) {}
     return;
   }
 
-  showMessage("SHARE NOT SUPPORTED");
+  showMessage("写真共有機能が利用できません");
 }
 
 let messageTimer = null;
