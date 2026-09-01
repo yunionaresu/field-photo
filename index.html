@@ -174,7 +174,7 @@
       white-space: nowrap;
     }
 
-    /* ★ ズレない精密SVG矢印 */
+    /* 精密SVG矢印 */
     #arrowPreview {
       position: absolute;
       z-index: 9;
@@ -354,25 +354,31 @@
       border-color: var(--brand-red);
     }
 
+    /* ギャラリー下部ボタンエリア */
+    .gallery-action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.3fr;
+      gap: 6px;
+    }
     .btn-action-primary {
       height: 50px;
       background: var(--brand-red);
       color: #ffffff;
       border: none;
       border-radius: 10px;
-      font-size: 1.05rem;
+      font-size: 0.95rem;
       font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 4px;
       box-shadow: 0 3px 10px rgba(230, 0, 18, 0.3);
     }
     .btn-action-primary:active {
       background: var(--brand-red-dark);
     }
 
-    /* トグルスイッチ（設定用） */
     .setting-toggle-row {
       display: flex;
       align-items: center;
@@ -427,7 +433,7 @@
   <main id="cameraStage">
     <video id="video" autoplay playsinline webkit-playsinline muted></video>
 
-    <!-- ★ 起動案内（カメラの使用を許可してください） -->
+    <!-- 起動案内 -->
     <div id="cameraStart">
       <div class="card-dialog">
         <div style="font-size:2.4rem;">📷</div>
@@ -458,7 +464,7 @@
     <!-- スタンプ -->
     <div id="stampPreview"></div>
 
-    <!-- ズレない精密SVG矢印 -->
+    <!-- 精密SVG矢印 -->
     <div id="arrowPreview">
       <svg viewBox="0 0 100 100" class="arrow-svg">
         <line x1="20" y1="80" x2="72" y2="28" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
@@ -499,10 +505,16 @@
       <label style="font-size:0.85rem; font-weight:700; color:var(--text-sub);">受付番号</label>
       <input id="jobNumber" class="clean-input" type="text" placeholder="例: 26H0043982">
       
-      <div style="display:grid; grid-template-columns: 1fr 1.6fr; gap:8px;">
-        <button class="tile-btn" id="btnSelectAllToggle" style="height:50px; font-size:0.95rem;">全選択/解除</button>
+      <!-- ★ 全選択/解除・保存・送信ボタングループ -->
+      <div class="gallery-action-grid">
+        <button class="tile-btn" id="btnSelectAllToggle" style="height:50px; font-size:0.85rem;">
+          全選択/解除
+        </button>
+        <button class="tile-btn" id="btnSaveToDevice" style="height:50px; font-size:0.85rem; background:#ffffff;">
+          📥 保存
+        </button>
         <button class="btn-action-primary" id="sendButton">
-          ☑ 選択写真を共有
+          ✉ 選択写真を送信
         </button>
       </div>
     </div>
@@ -518,7 +530,7 @@
     </div>
     
     <div class="modal-body" style="gap:16px;">
-      <!-- ★ 操作音（クリッカー音）ON/OFF -->
+      <!-- 操作音（クリッカー音）ON/OFF -->
       <div class="setting-toggle-row">
         <div>
           <div style="font-weight:700;">操作音（クリッカー音）</div>
@@ -568,7 +580,7 @@
    Web Audio API: クリッカー音 & シャッター音
 ========================================================= */
 let audioCtx = null;
-let isSoundEnabled = localStorage.getItem("isSoundEnabled") !== "false"; // 初期値: ON
+let isSoundEnabled = localStorage.getItem("isSoundEnabled") !== "false";
 
 function initAudioContext() {
   if (!audioCtx) {
@@ -579,7 +591,6 @@ function initAudioContext() {
   }
 }
 
-// ボタンタップ時の歯切れの良いクリッカー音
 function playClickSound() {
   if (!isSoundEnabled) return;
   try {
@@ -603,13 +614,11 @@ function playClickSound() {
   } catch(e) {}
 }
 
-// 撮影時のシャッター効果音
 function playShutterSound() {
   if (!isSoundEnabled) return;
   try {
     initAudioContext();
     const now = audioCtx.currentTime;
-    // 2連クリック音（カシャ）
     [0, 0.04].forEach((delay) => {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
@@ -661,7 +670,6 @@ window.addEventListener("load", function() {
   updateSettingsUI();
   updateSoundUI();
   updateStampPreview();
-  // 初期画面は必ずカメラ案内画面を表示
   cameraStart.style.display = "flex";
   cameraError.style.display = "none";
 });
@@ -676,7 +684,6 @@ function setupEvents() {
     startCamera();
   });
 
-  // 音のトグル
   soundToggleBtn.addEventListener("click", () => {
     isSoundEnabled = !isSoundEnabled;
     localStorage.setItem("isSoundEnabled", String(isSoundEnabled));
@@ -684,7 +691,6 @@ function setupEvents() {
     if (isSoundEnabled) playClickSound();
   });
 
-  // スタンプ選択
   document.querySelectorAll("[data-stamp]").forEach(btn => {
     btn.addEventListener("click", function() {
       playClickSound();
@@ -702,7 +708,6 @@ function setupEvents() {
     capturePhoto();
   });
 
-  // ギャラリー・設定開閉
   document.getElementById("galleryButton").addEventListener("click", () => {
     playClickSound();
     openGallery();
@@ -724,7 +729,6 @@ function setupEvents() {
     closeSettings();
   });
 
-  // 設定変更
   document.querySelectorAll("[data-position]").forEach(btn => {
     btn.addEventListener("click", function() {
       playClickSound();
@@ -738,16 +742,21 @@ function setupEvents() {
     });
   });
 
-  // 矢印ドラッグ操作
   cameraStage.addEventListener("pointerdown", arrowPointerDown);
   cameraStage.addEventListener("pointermove", arrowPointerMove);
   cameraStage.addEventListener("pointerup", arrowPointerUp);
   cameraStage.addEventListener("pointercancel", arrowPointerUp);
 
-  // 共有
+  // 送信
   document.getElementById("sendButton").addEventListener("click", () => {
     playClickSound();
     sendSelectedPhotos();
+  });
+
+  // ★ iPhone写真アプリへの保存ボタン
+  document.getElementById("btnSaveToDevice").addEventListener("click", () => {
+    playClickSound();
+    savePhotosToDevice();
   });
 
   // 全選択トグル
@@ -1122,7 +1131,45 @@ function updateSettingsUI() {
   });
 }
 
-/* 共有送信 */
+/* =========================================================
+   ★ iPhone写真アプリへの保存機能
+========================================================= */
+async function savePhotosToDevice() {
+  const selected = photos.filter(p => p.selected);
+  if (selected.length === 0) {
+    showMessage("写真を選択してください");
+    return;
+  }
+
+  const files = [];
+  for (let i = 0; i < selected.length; i++) {
+    const photo = selected[i];
+    const buffer = await photo.blob.arrayBuffer();
+    files.push(new File([buffer], `現場写真_${Date.now()}_${String(i+1).padStart(2,"0")}.jpg`, { type: "image/jpeg" }));
+  }
+
+  // iOSの共有シートを開く（「画像を保存」をタップするとカメラロールに保存される）
+  if (navigator.share && navigator.canShare && navigator.canShare({ files: files })) {
+    try {
+      await navigator.share({ files: files });
+      showMessage("保存ダイアログを開きました");
+    } catch(e) {}
+    return;
+  }
+
+  // フォールバック（通常ダウンロード）
+  selected.forEach((p, idx) => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(p.blob);
+    a.download = `現場写真_${Date.now()}_${idx+1}.jpg`;
+    a.click();
+  });
+  showMessage("ダウンロードを開始しました");
+}
+
+/* =========================================================
+   ★ メール・LINE共有送信（受付番号はタイトルのみ）
+========================================================= */
 async function sendSelectedPhotos() {
   const selected = photos.filter(p => p.selected);
   if (selected.length === 0) {
@@ -1136,7 +1183,8 @@ async function sendSelectedPhotos() {
     return;
   }
 
-  const subject = "受付番号: " + jobNumber + " 現場写真報告分";
+  // ★ メール件名（タイトル欄）にのみ受付番号を設定
+  const emailTitle = "受付番号: " + jobNumber + " 現場写真報告分";
   const files = [];
 
   for (let i = 0; i < selected.length; i++) {
@@ -1147,8 +1195,13 @@ async function sendSelectedPhotos() {
 
   if (navigator.share && navigator.canShare && navigator.canShare({ files: files })) {
     try {
-      await navigator.share({ title: subject, text: subject, files: files });
-      showMessage("共有メニューを開きました");
+      // ★ text（本文）は空文字にして、本文に受付番号が入らないようにする
+      await navigator.share({
+        title: emailTitle,
+        text: "",
+        files: files
+      });
+      showMessage("送信メニューを開きました");
     } catch(e) {}
     return;
   }
