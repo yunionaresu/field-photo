@@ -5,20 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>現場写真.exe</title>
+  <title>現場写真 - Glass Cam</title>
 
   <style>
     /* =========================================================
-       Windows 95 共通クラシックスタイル
+       グラスモーフィズム 基本設定 & トークン
     ========================================================= */
     :root {
-      --win-bg: #c0c0c0;
-      --win-light: #ffffff;
-      --win-shadow: #808080;
-      --win-dark: #000000;
-      --win-title: #000080;
-      --win-title-text: #ffffff;
-      --win-font: "MS UI Gothic", "MS PGothic", "Segoe UI", Tahoma, sans-serif;
+      --bg-gradient: radial-gradient(circle at 20% 20%, #1e1b4b 0%, #0f172a 50%, #020617 100%);
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-bg-active: rgba(59, 130, 246, 0.25);
+      --glass-border: rgba(255, 255, 255, 0.16);
+      --glass-border-glow: rgba(96, 165, 250, 0.6);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+      --glass-blur: blur(20px);
+      --glass-blur-webkit: blur(20px);
+      
+      --accent: #38bdf8;
+      --accent-glow: 0 0 16px rgba(56, 189, 248, 0.5);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --danger: #f43f5e;
     }
 
     * {
@@ -33,127 +40,125 @@
     html, body {
       width: 100%;
       height: 100%;
-      background: var(--win-bg);
-      color: #000000;
-      font-family: var(--win-font);
+      background: #020617;
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
       overflow: hidden;
       overscroll-behavior: none;
-      font-size: 13px;
     }
 
-    /* 3D立体凸枠（Raised Bevel） */
-    .win-outset {
-      border: 2px solid;
-      border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
-      box-shadow: inset 1px 1px 0 var(--win-bg), inset -1px -1px 0 var(--win-shadow);
+    body {
+      touch-action: manipulation;
+      background: var(--bg-gradient);
+      position: relative;
     }
 
-    /* 3D立体凹枠（Sunken Bevel / 押し込み） */
-    .win-inset {
-      border: 2px solid;
-      border-color: var(--win-shadow) var(--win-light) var(--win-light) var(--win-shadow);
-      box-shadow: inset 1px 1px 0 var(--win-dark), inset -1px -1px 0 var(--win-bg);
+    /* 背景の装飾光（ガラスの屈折感を強調） */
+    .bg-blob-1 {
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.25), transparent 70%);
+      border-radius: 50%;
+      filter: blur(40px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-blob-2 {
+      position: absolute;
+      bottom: 10%;
+      right: -10%;
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(147, 51, 234, 0.2), transparent 70%);
+      border-radius: 50%;
+      filter: blur(50px);
+      pointer-events: none;
+      z-index: 0;
     }
 
-    /* 標準Win95ボタン */
-    .win-btn {
-      background: var(--win-bg);
-      border: 2px solid;
-      border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
-      box-shadow: inset 1px 1px 0 var(--win-bg), inset -1px -1px 0 var(--win-shadow);
-      color: #000;
-      font-family: var(--win-font);
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4px 8px;
-      text-decoration: none;
-    }
-    .win-btn:active, .win-btn.active, .win-btn.selected {
-      border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
-      box-shadow: inset 1px 1px 0 var(--win-shadow), inset -1px -1px 0 var(--win-bg);
-      background: #b5b5b5;
-      padding: 5px 7px 3px 9px; /* 押した時のわずかなズレを再現 */
-    }
-
-    /* タイトルバー */
-    .title-bar {
-      height: 28px;
-      background: var(--win-title);
-      color: var(--win-title-text);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 4px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-    .title-bar-text {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 12px;
-    }
-    .title-bar-controls {
-      display: flex;
-      gap: 2px;
-    }
-    .title-btn {
-      width: 18px;
-      height: 16px;
-      background: var(--win-bg);
-      border: 1.5px solid;
-      border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
-      color: #000;
-      font-size: 10px;
-      line-height: 1;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    /* メインウィンドウ */
     #app {
       width: 100%;
       height: 100dvh;
       display: flex;
       flex-direction: column;
-      background: var(--win-bg);
-      border: 3px solid;
-      border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
+      position: relative;
+      z-index: 1;
     }
 
-    /* メニューバー */
-    .menu-bar {
-      height: 24px;
+    /* 共通グラスパネル */
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur-webkit);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      border-radius: 20px;
+    }
+
+    /* =========================================================
+       ヘッダー（フローティンググラスバー）
+    ========================================================= */
+    .header {
+      height: 60px;
+      margin: 10px 12px 6px;
+      padding: 0 16px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 0 8px;
-      border-bottom: 1px solid var(--win-shadow);
-      background: var(--win-bg);
+      justify-content: space-between;
+      border-radius: 18px;
     }
-    .menu-item {
+    .logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header-right {
+      display: flex;
+      gap: 8px;
+    }
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      color: #000;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .menu-item span {
-      text-decoration: underline;
+    .icon-btn:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.18);
     }
 
-    /* カメラファインダー枠 */
+    /* =========================================================
+       カメラステージ
+    ========================================================= */
     #cameraStage {
       position: relative;
       flex: 1;
       min-height: 0;
-      margin: 4px;
-      background: #000;
+      margin: 4px 12px;
+      border-radius: 24px;
       overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
+      background: #000;
       touch-action: none;
     }
     #video {
@@ -165,7 +170,7 @@
       pointer-events: none;
     }
 
-    /* カメラ起動ダイアログ */
+    /* 起動画面・エラーモーダル */
     #cameraStart, #cameraError {
       position: absolute;
       inset: 0;
@@ -173,793 +178,878 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
-      background: rgba(0, 0, 0, 0.7);
+      padding: 24px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
     }
-    .dialog-box {
-      width: 90%;
+    .start-dialog {
+      width: 100%;
       max-width: 320px;
-      background: var(--win-bg);
-      border: 2px solid;
-      border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
-      box-shadow: 2px 2px 0 var(--win-dark);
-      padding: 2px;
-    }
-    .dialog-content {
-      padding: 16px;
+      padding: 28px 20px;
+      text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      text-align: center;
-      gap: 10px;
+      gap: 12px;
+    }
+    .start-icon {
+      font-size: 3rem;
+      margin-bottom: 4px;
+      filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.4));
+    }
+    .btn-primary {
+      margin-top: 10px;
+      padding: 13px 28px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.8), rgba(37, 99, 235, 0.8));
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.4);
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+    .btn-primary:active {
+      transform: scale(0.96);
     }
 
-    /* スタンプ */
+    /* スタンプ（グラスバッジ） */
     #stampPreview {
       position: absolute;
       z-index: 8;
       display: none;
-      padding: 4px 8px;
-      border: 2px solid #fff;
-      background: rgba(0, 0, 0, 0.75);
+      padding: 6px 14px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
       color: #fff;
-      font-size: 15px;
+      font-size: 1rem;
       font-weight: 700;
+      letter-spacing: 0.05em;
       pointer-events: none;
       white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     }
 
-    /* 矢印 */
+    /* 矢印（グラスネオン） */
     #arrowPreview {
       position: absolute;
       z-index: 9;
       display: none;
-      width: 90px;
-      height: 90px;
+      width: 100px;
+      height: 100px;
       transform: translate(-50%, -50%);
       pointer-events: none;
     }
     .arrowLine {
       position: absolute;
-      width: 60px;
+      width: 70px;
       height: 6px;
       left: 10px;
-      top: 55px;
-      background: #ff0000;
-      border-radius: 2px;
+      top: 65px;
+      background: var(--danger);
+      border-radius: 4px;
       transform: rotate(-45deg);
       transform-origin: right center;
-      box-shadow: 0 1px 3px #000;
+      box-shadow: 0 0 10px var(--danger), 0 2px 6px rgba(0,0,0,0.8);
     }
     .arrowHead {
       position: absolute;
       width: 0;
       height: 0;
-      left: 56px;
+      left: 68px;
       top: 10px;
-      border-left: 18px solid #ff0000;
-      border-top: 10px solid transparent;
-      border-bottom: 10px solid transparent;
+      border-left: 20px solid var(--danger);
+      border-top: 12px solid transparent;
+      border-bottom: 12px solid transparent;
       transform: rotate(-45deg);
+      filter: drop-shadow(0 0 8px var(--danger));
     }
 
-    /* 操作エリア */
-    .controls-panel {
-      padding: 6px 8px 12px;
-      background: var(--win-bg);
+    /* =========================================================
+       下部フローティンググラスドック
+    ========================================================= */
+    .controls-dock {
+      margin: 8px 12px 14px;
+      padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      border-top: 1px solid var(--win-light);
-      padding-bottom: calc(8px + env(safe-area-inset-bottom));
+      gap: 12px;
     }
 
-    .tools-grid {
+    .tools-segment {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-chip {
+      background: transparent;
+      border: none;
+      color: var(--text-sub);
+      padding: 10px 0;
+      font-size: 0.88rem;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .glass-chip.active {
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.25);
     }
 
-    .shutter-wrapper {
+    /* シャッターボタン（グローリング） */
+    .shutter-row {
       display: flex;
       justify-content: center;
-      margin-top: 4px;
+      align-items: center;
     }
-    .shutter-btn-win {
-      width: 100%;
-      height: 48px;
-      font-size: 16px;
-      font-weight: bold;
-      background: var(--win-bg);
+    .shutter-glass-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 2.5px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2), inset 0 0 12px rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .shutter-glass-btn:active {
+      transform: scale(0.9);
+      background: rgba(255, 255, 255, 0.25);
+    }
+    .shutter-inner-core {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
     }
 
-    /* 全画面モーダル（ダイアログ風） */
-    .win-modal {
+    /* =========================================================
+       全画面モーダル（ギャラリー・設定）
+    ========================================================= */
+    .glass-modal {
       position: fixed;
       inset: 0;
       z-index: 100;
       display: none;
       flex-direction: column;
-      background: rgba(0,0,0,0.5);
-      padding: 8px;
+      background: rgba(10, 15, 30, 0.75);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      padding: 12px;
     }
-    .win-modal.show { display: flex; }
+    .glass-modal.show { display: flex; }
 
-    .win-modal-window {
-      width: 100%;
-      height: 100%;
-      background: var(--win-bg);
+    .modal-frame {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      border: 3px solid;
-      border-color: var(--win-light) var(--win-dark) var(--win-dark) var(--win-light);
-      box-shadow: 2px 2px 0 var(--win-dark);
+      border-radius: 24px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
     }
 
-    .win-modal-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 8px;
-      background: #ffffff;
-      margin: 4px;
-    }
-
-    /* ギャラリーアイテム */
-    .photo-row {
+    .modal-header {
+      height: 56px;
+      padding: 0 16px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 6px;
-      border-bottom: 1px dotted var(--win-shadow);
-      background: #fff;
-      color: #000;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
     }
-    .photo-row:nth-child(even) {
-      background: #f8f8f8;
+    .modal-title {
+      font-size: 1.05rem;
+      font-weight: 700;
     }
-    .photo-thumb {
-      width: 60px;
-      height: 60px;
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ギャラリーカード */
+    .gallery-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+    }
+    .gallery-thumb {
+      width: 72px;
+      height: 72px;
+      border-radius: 10px;
       object-fit: cover;
-      border: 1px solid var(--win-dark);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .modal-bottom {
-      padding: 6px;
-      background: var(--win-bg);
-      border-top: 1px solid var(--win-light);
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 10px;
+      padding-bottom: calc(14px + env(safe-area-inset-bottom));
     }
 
-    /* テキスト入力 */
-    .win-input {
+    .glass-input {
       width: 100%;
-      height: 32px;
-      padding: 0 6px;
-      background: #fff;
-      border: 2px solid;
-      border-color: var(--win-shadow) var(--win-light) var(--win-light) var(--win-shadow);
-      font-family: var(--win-font);
-      font-size: 14px;
+      height: 48px;
+      padding: 0 14px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 1rem;
       outline: none;
+      backdrop-filter: blur(10px);
+    }
+    .glass-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
     }
 
-    /* トーストメッセージ */
+    /* トースト通知 */
     #message {
       position: fixed;
       left: 50%;
-      bottom: 120px;
+      bottom: 130px;
       transform: translateX(-50%);
       z-index: 200;
       display: none;
-      padding: 6px 14px;
-      background: #ffffe1; /* 黄色いツールチップ風 */
-      color: #000;
-      border: 1px solid #000;
-      box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
-      font-size: 12px;
+      padding: 10px 20px;
+      border-radius: 20px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      white-space: nowrap;
     }
   </style>
 </head>
 
 <body>
 
-<div id="app">
+  <!-- 背景オーブ -->
+  <div class="bg-blob-1"></div>
+  <div class="bg-blob-2"></div>
 
-  <!-- Windows 95 タイトルバー -->
-  <div class="title-bar">
-    <div class="title-bar-text">
-      <span>💾</span>
-      <span>現場写真.exe</span>
-    </div>
-    <div class="title-bar-controls">
-      <button class="title-btn" id="galleryButton" title="写真一覧">📁</button>
-      <button class="title-btn" id="settingsButton" title="プロパティ">⚙</button>
-      <button class="title-btn" onclick="location.reload()">✕</button>
-    </div>
-  </div>
+  <div id="app">
 
-  <!-- メニューバー -->
-  <div class="menu-bar">
-    <div class="menu-item" id="menuPhotos"><u>F</u>写真一覧</div>
-    <div class="menu-item" id="menuSettings"><u>O</u>オプション</div>
-    <div class="menu-item" onclick="showMessage('現場カメラ Win95版 v1.0')"><u>H</u>バージョン</div>
-  </div>
+    <!-- グラスヘッダー -->
+    <header class="header glass-card">
+      <div class="logo">
+        <span>📸</span> 現場写真 <span>PRO</span>
+      </div>
+      <div class="header-right">
+        <button class="icon-btn" id="galleryButton" title="写真一覧">📁</button>
+        <button class="icon-btn" id="settingsButton" title="設定">⚙️</button>
+      </div>
+    </header>
 
-  <!-- カメラステージ（Sunken Inset） -->
-  <main id="cameraStage" class="win-inset">
-    <video id="video" autoplay playsinline webkit-playsinline muted></video>
+    <!-- カメラステージ -->
+    <main id="cameraStage">
+      <video id="video" autoplay playsinline webkit-playsinline muted></video>
 
-    <!-- カメラ起動ダイアログ -->
-    <div id="cameraStart">
-      <div class="dialog-box">
-        <div class="title-bar">
-          <div class="title-bar-text">📷 カメラの起動</div>
-        </div>
-        <div class="dialog-content">
-          <p>現場写真を撮影するために<br>カメラデバイスを初期化します。</p>
-          <button class="win-btn" id="startCameraButton" style="width:120px; height:32px;">実行 (<u>O</u>K)</button>
+      <!-- カメラ起動画面 -->
+      <div id="cameraStart">
+        <div class="start-dialog glass-card">
+          <div class="start-icon">📷</div>
+          <h2 style="font-size:1.25rem;">カメラを起動</h2>
+          <p style="color:var(--text-sub); font-size:0.88rem; line-height:1.6;">
+            現場写真の撮影を開始するには<br>カメラへのアクセスを許可してください
+          </p>
+          <button class="btn-primary" id="startCameraButton">カメラを起動する</button>
         </div>
       </div>
-    </div>
 
-    <!-- カメラエラーダイアログ -->
-    <div id="cameraError">
-      <div class="dialog-box">
-        <div class="title-bar" style="background:#800000;">
-          <div class="title-bar-text">⚠️ システム エラー</div>
-        </div>
-        <div class="dialog-content">
-          <p id="cameraErrorText">カメラにアクセスできません。</p>
-          <button class="win-btn" id="retryButton" style="width:100px;">再試行(<u>R</u>)</button>
+      <!-- カメラエラー画面 -->
+      <div id="cameraError">
+        <div class="start-dialog glass-card">
+          <div class="start-icon" style="color:var(--danger);">⚠️</div>
+          <h2 style="font-size:1.2rem; color:var(--danger);">起動エラー</h2>
+          <p id="cameraErrorText" style="color:var(--text-sub); font-size:0.85rem;"></p>
+          <button class="btn-primary" id="retryButton">再試行</button>
         </div>
       </div>
-    </div>
 
-    <!-- スタンプ -->
-    <div id="stampPreview"></div>
+      <!-- スタンプ -->
+      <div id="stampPreview"></div>
 
-    <!-- 矢印 -->
-    <div id="arrowPreview">
-      <div class="arrowLine"></div>
-      <div class="arrowHead"></div>
-    </div>
-  </main>
+      <!-- 矢印 -->
+      <div id="arrowPreview">
+        <div class="arrowLine"></div>
+        <div class="arrowHead"></div>
+      </div>
+    </main>
 
-  <!-- 下部操作パネル -->
-  <section class="controls-panel">
-    <div class="tools-grid">
-      <button class="win-btn toolButton" data-stamp="作業前">作業前</button>
-      <button class="win-btn toolButton" data-stamp="作業中">作業中</button>
-      <button class="win-btn toolButton" data-stamp="作業後">作業後</button>
-      <button class="win-btn toolButton" id="arrowButton">➜ 矢印</button>
-    </div>
+    <!-- 下部フローティングコントロール -->
+    <section class="controls-dock glass-card">
+      <div class="tools-segment">
+        <button class="glass-chip toolButton" data-stamp="作業前">作業前</button>
+        <button class="glass-chip toolButton" data-stamp="作業中">作業中</button>
+        <button class="glass-chip toolButton" data-stamp="作業後">作業後</button>
+        <button class="glass-chip toolButton" id="arrowButton">➜ 矢印</button>
+      </div>
 
-    <div class="shutter-wrapper">
-      <button class="win-btn shutter-btn-win" id="captureButton">
-        📸 撮影を実行 (<u>S</u>nap)
-      </button>
+      <div class="shutter-row">
+        <button class="shutter-glass-btn" id="captureButton">
+          <div class="shutter-inner-core"></div>
+        </button>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- 📁 ギャラリーモーダル -->
+  <section id="gallery" class="glass-modal">
+    <div class="modal-frame glass-card">
+      <div class="modal-header">
+        <div class="modal-title">📁 撮影済み写真</div>
+        <button class="icon-btn" id="closeGallery" style="width:36px; height:36px;">✕</button>
+      </div>
+      
+      <div class="modal-body" id="galleryList"></div>
+      
+      <div class="modal-bottom">
+        <input id="jobNumber" class="glass-input" type="text" placeholder="受付番号を入力 (例: 26H0043982)">
+        <div style="display:grid; grid-template-columns: 1fr 1.6fr; gap:8px;">
+          <button class="glass-chip" id="btnSelectAllToggle" style="background:rgba(255,255,255,0.08); height:46px;">全選択/解除</button>
+          <button class="btn-primary" id="sendButton" style="height:46px; margin:0; padding:0;">
+            ☑ 選択写真を共有
+          </button>
+        </div>
+      </div>
     </div>
   </section>
 
-</div>
+  <!-- ⚙ 設定モーダル -->
+  <section id="settings" class="glass-modal">
+    <div class="modal-frame glass-card">
+      <div class="modal-header">
+        <div class="modal-title">⚙️ スタンプ・矢印設定</div>
+        <button class="icon-btn" id="closeSettings" style="width:36px; height:36px;">✕</button>
+      </div>
+      
+      <div class="modal-body">
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <label style="font-size:0.85rem; color:var(--text-sub);">作業状態スタンプの位置</label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <button class="glass-chip" data-position="top-left">↖ 左上</button>
+            <button class="glass-chip" data-position="top-right">↗ 右上</button>
+            <button class="glass-chip" data-position="bottom-left">↙ 左下</button>
+            <button class="glass-chip" data-position="bottom-right">↘ 右下</button>
+          </div>
+        </div>
 
-<!-- 📁 ギャラリーウィンドウ（エクスプローラー風） -->
-<section id="gallery" class="win-modal">
-  <div class="win-modal-window">
-    <div class="title-bar">
-      <div class="title-bar-text">📁 撮影済みファイル一覧</div>
-      <button class="title-btn" id="closeGallery">✕</button>
-    </div>
-    <div class="win-modal-body win-inset" id="galleryList"></div>
-    
-    <div class="modal-bottom">
-      <input id="jobNumber" class="win-input" type="text" placeholder="受付番号を入力 (例: 26H0043982)">
-      <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:6px;">
-        <button class="win-btn" id="btnSelectAllToggle">全選択/解除</button>
-        <button class="win-btn" id="sendButton" style="font-weight:bold; background:#e0e0e0;">
-          ✉ 選択ファイルを送信/共有
-        </button>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+          <label style="font-size:0.85rem; color:var(--text-sub);">矢印の大きさ</label>
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;">
+            <button class="glass-chip" data-arrow-size="0.7">小</button>
+            <button class="glass-chip" data-arrow-size="1">標準</button>
+            <button class="glass-chip" data-arrow-size="1.4">大</button>
+            <button class="glass-chip" data-arrow-size="1.8">特大</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-bottom">
+        <button class="btn-primary" id="closeSettingsBtn" style="height:46px; margin:0;">完了</button>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ⚙ 設定ウィンドウ（プロパティ風） -->
-<section id="settings" class="win-modal">
-  <div class="win-modal-window">
-    <div class="title-bar">
-      <div class="title-bar-text">⚙ システムのプロパティ</div>
-      <button class="title-btn" id="closeSettings">✕</button>
-    </div>
-    
-    <div class="win-modal-body win-inset" style="background:var(--win-bg); display:flex; flex-direction:column; gap:12px;">
-      <fieldset style="border:2px solid; border-color:var(--win-shadow) var(--win-light) var(--win-light) var(--win-shadow); padding:8px;">
-        <legend style="padding:0 4px; font-weight:bold;">スタンプの刻印位置</legend>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:4px;">
-          <button class="win-btn" data-position="top-left">左上</button>
-          <button class="win-btn" data-position="top-right">右上</button>
-          <button class="win-btn" data-position="bottom-left">左下</button>
-          <button class="win-btn" data-position="bottom-right">右下</button>
-        </div>
-      </fieldset>
+  <!-- トースト通知 -->
+  <div id="message"></div>
 
-      <fieldset style="border:2px solid; border-color:var(--win-shadow) var(--win-light) var(--win-light) var(--win-shadow); padding:8px;">
-        <legend style="padding:0 4px; font-weight:bold;">矢印スタンプの倍率</legend>
-        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:4px; margin-top:4px;">
-          <button class="win-btn" data-arrow-size="0.7">70%</button>
-          <button class="win-btn" data-arrow-size="1">100%</button>
-          <button class="win-btn" data-arrow-size="1.4">140%</button>
-          <button class="win-btn" data-arrow-size="1.8">180%</button>
-        </div>
-      </fieldset>
-    </div>
+  <script>
+    /* =========================================================
+       ロジック部（完全動作版）
+    ========================================================= */
+    const video = document.getElementById("video");
+    const cameraStage = document.getElementById("cameraStage");
+    const cameraStart = document.getElementById("cameraStart");
+    const cameraError = document.getElementById("cameraError");
+    const cameraErrorText = document.getElementById("cameraErrorText");
+    const startCameraButton = document.getElementById("startCameraButton");
+    const retryButton = document.getElementById("retryButton");
+    const captureButton = document.getElementById("captureButton");
+    const stampPreview = document.getElementById("stampPreview");
+    const arrowPreview = document.getElementById("arrowPreview");
+    const gallery = document.getElementById("gallery");
+    const settings = document.getElementById("settings");
 
-    <div class="modal-bottom" style="display:flex; justify-content:flex-end;">
-      <button class="win-btn" id="closeSettingsBtn" style="width:80px;">OK</button>
-    </div>
-  </div>
-</section>
+    let stream = null;
+    let cameraStarted = false;
+    let currentStamp = null;
+    let stampPosition = localStorage.getItem("stampPosition") || "top-right";
+    let arrowSize = Number(localStorage.getItem("arrowSize") || "1");
+    let arrowPoint = null;
+    let draggingArrow = false;
+    let photos = [];
 
-<!-- トースト -->
-<div id="message"></div>
-
-<script>
-/* =========================================================
-   ロジック部（完全動作版）
-========================================================= */
-const video = document.getElementById("video");
-const cameraStage = document.getElementById("cameraStage");
-const cameraStart = document.getElementById("cameraStart");
-const cameraError = document.getElementById("cameraError");
-const cameraErrorText = document.getElementById("cameraErrorText");
-const startCameraButton = document.getElementById("startCameraButton");
-const retryButton = document.getElementById("retryButton");
-const captureButton = document.getElementById("captureButton");
-const stampPreview = document.getElementById("stampPreview");
-const arrowPreview = document.getElementById("arrowPreview");
-const gallery = document.getElementById("gallery");
-const settings = document.getElementById("settings");
-
-let stream = null;
-let cameraStarted = false;
-let currentStamp = null;
-let stampPosition = localStorage.getItem("stampPosition") || "top-right";
-let arrowSize = Number(localStorage.getItem("arrowSize") || "1");
-let arrowPoint = null;
-let draggingArrow = false;
-let photos = [];
-
-window.addEventListener("load", function() {
-  setupEvents();
-  updateSettingsUI();
-  updateStampPreview();
-  cameraStart.style.display = "flex";
-});
-
-function setupEvents() {
-  startCameraButton.addEventListener("click", startCamera);
-  retryButton.addEventListener("click", startCamera);
-
-  document.querySelectorAll("[data-stamp]").forEach(btn => {
-    btn.addEventListener("click", function() {
-      selectStamp(this.dataset.stamp);
-    });
-  });
-
-  document.getElementById("arrowButton").addEventListener("click", selectArrow);
-  captureButton.addEventListener("click", capturePhoto);
-
-  // ギャラリー開閉
-  document.getElementById("galleryButton").addEventListener("click", openGallery);
-  document.getElementById("menuPhotos").addEventListener("click", openGallery);
-  document.getElementById("closeGallery").addEventListener("click", closeGallery);
-
-  // 設定開閉
-  document.getElementById("settingsButton").addEventListener("click", openSettings);
-  document.getElementById("menuSettings").addEventListener("click", openSettings);
-  document.getElementById("closeSettings").addEventListener("click", closeSettings);
-  document.getElementById("closeSettingsBtn").addEventListener("click", closeSettings);
-
-  // 設定項目
-  document.querySelectorAll("[data-position]").forEach(btn => {
-    btn.addEventListener("click", function() { setStampPosition(this.dataset.position); });
-  });
-  document.querySelectorAll("[data-arrow-size]").forEach(btn => {
-    btn.addEventListener("click", function() { setArrowSize(Number(this.dataset.arrowSize)); });
-  });
-
-  // 矢印ドラッグ操作
-  cameraStage.addEventListener("pointerdown", arrowPointerDown);
-  cameraStage.addEventListener("pointermove", arrowPointerMove);
-  cameraStage.addEventListener("pointerup", arrowPointerUp);
-  cameraStage.addEventListener("pointercancel", arrowPointerUp);
-
-  // 共有
-  document.getElementById("sendButton").addEventListener("click", sendSelectedPhotos);
-
-  // 全選択トグル
-  document.getElementById("btnSelectAllToggle").addEventListener("click", () => {
-    const hasUnchecked = photos.some(p => !p.selected);
-    photos.forEach(p => p.selected = hasUnchecked);
-    renderGallery();
-  });
-}
-
-/* カメラ起動 */
-async function startCamera() {
-  cameraStart.style.display = "none";
-  cameraError.style.display = "none";
-
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    showCameraError("このブラウザではカメラAPIを利用できません。");
-    return;
-  }
-
-  if (stream) {
-    stream.getTracks().forEach(t => t.stop());
-    stream = null;
-  }
-
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: "environment" } },
-      audio: false
+    window.addEventListener("load", function() {
+      setupEvents();
+      updateSettingsUI();
+      updateStampPreview();
+      cameraStart.style.display = "flex";
     });
 
-    video.srcObject = stream;
-    video.setAttribute("playsinline", "");
-    video.setAttribute("webkit-playsinline", "");
-    video.muted = true;
-    await video.play();
+    function setupEvents() {
+      startCameraButton.addEventListener("click", startCamera);
+      retryButton.addEventListener("click", startCamera);
 
-    cameraStarted = true;
-    showMessage("カメラデバイス準備完了");
-  } catch (error) {
-    console.error(error);
-    showCameraError("カメラを起動できませんでした (" + error.name + ")");
-  }
-}
+      document.querySelectorAll("[data-stamp]").forEach(btn => {
+        btn.addEventListener("click", function() {
+          selectStamp(this.dataset.stamp);
+        });
+      });
 
-function showCameraError(text) {
-  cameraStart.style.display = "none";
-  cameraError.style.display = "flex";
-  cameraErrorText.textContent = text;
-}
+      document.getElementById("arrowButton").addEventListener("click", selectArrow);
+      captureButton.addEventListener("click", capturePhoto);
 
-/* スタンプ & 矢印 */
-function selectStamp(label) {
-  currentStamp = label;
-  arrowPoint = null;
-  draggingArrow = false;
-  arrowPreview.style.display = "none";
+      // ギャラリー開閉
+      document.getElementById("galleryButton").addEventListener("click", openGallery);
+      document.getElementById("closeGallery").addEventListener("click", closeGallery);
 
-  document.querySelectorAll(".toolButton").forEach(b => b.classList.remove("active"));
-  const target = document.querySelector('[data-stamp="' + label + '"]');
-  if (target) target.classList.add("active");
+      // 設定開閉
+      document.getElementById("settingsButton").addEventListener("click", openSettings);
+      document.getElementById("closeSettings").addEventListener("click", closeSettings);
+      document.getElementById("closeSettingsBtn").addEventListener("click", closeSettings);
 
-  stampPreview.textContent = label;
-  stampPreview.style.display = "block";
-  updateStampPreview();
-}
+      // 設定項目
+      document.querySelectorAll("[data-position]").forEach(btn => {
+        btn.addEventListener("click", function() { setStampPosition(this.dataset.position); });
+      });
+      document.querySelectorAll("[data-arrow-size]").forEach(btn => {
+        btn.addEventListener("click", function() { setArrowSize(Number(this.dataset.arrowSize)); });
+      });
 
-function selectArrow() {
-  currentStamp = null;
-  stampPreview.style.display = "none";
-  document.querySelectorAll(".toolButton").forEach(b => b.classList.remove("active"));
-  document.getElementById("arrowButton").classList.add("active");
+      // 矢印ドラッグ操作
+      cameraStage.addEventListener("pointerdown", arrowPointerDown);
+      cameraStage.addEventListener("pointermove", arrowPointerMove);
+      cameraStage.addEventListener("pointerup", arrowPointerUp);
+      cameraStage.addEventListener("pointercancel", arrowPointerUp);
 
-  if (!arrowPoint) {
-    showMessage("画面をタップして矢印を配置してください");
-  }
-}
+      // 共有
+      document.getElementById("sendButton").addEventListener("click", sendSelectedPhotos);
 
-function updateStampPreview() {
-  if (!currentStamp) {
-    stampPreview.style.display = "none";
-    return;
-  }
-  const m = 12;
-  stampPreview.style.left = "auto";
-  stampPreview.style.right = "auto";
-  stampPreview.style.top = "auto";
-  stampPreview.style.bottom = "auto";
+      // 全選択トグル
+      document.getElementById("btnSelectAllToggle").addEventListener("click", () => {
+        const hasUnchecked = photos.some(p => !p.selected);
+        photos.forEach(p => p.selected = hasUnchecked);
+        renderGallery();
+      });
+    }
 
-  if (stampPosition === "top-left") { stampPreview.style.left = m + "px"; stampPreview.style.top = m + "px"; }
-  else if (stampPosition === "top-right") { stampPreview.style.right = m + "px"; stampPreview.style.top = m + "px"; }
-  else if (stampPosition === "bottom-left") { stampPreview.style.left = m + "px"; stampPreview.style.bottom = m + "px"; }
-  else if (stampPosition === "bottom-right") { stampPreview.style.right = m + "px"; stampPreview.style.bottom = m + "px"; }
-}
+    /* カメラ起動 */
+    async function startCamera() {
+      cameraStart.style.display = "none";
+      cameraError.style.display = "none";
 
-function arrowPointerDown(event) {
-  const arrowButton = document.getElementById("arrowButton");
-  if (!arrowButton.classList.contains("active") || !cameraStarted) return;
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showCameraError("このブラウザではカメラ機能を利用できません。");
+        return;
+      }
 
-  event.preventDefault();
-  const point = getStagePoint(event);
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+      }
 
-  if (arrowPoint) {
-    const dx = point.x - arrowPoint.x;
-    const dy = point.y - arrowPoint.y;
-    if (Math.sqrt(dx * dx + dy * dy) < 70) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" } },
+          audio: false
+        });
+
+        video.srcObject = stream;
+        video.setAttribute("playsinline", "");
+        video.setAttribute("webkit-playsinline", "");
+        video.muted = true;
+        await video.play();
+
+        cameraStarted = true;
+        showMessage("リアカメラ起動完了");
+      } catch (error) {
+        console.error(error);
+        showCameraError("カメラを起動できませんでした (" + error.name + ")");
+      }
+    }
+
+    function showCameraError(text) {
+      cameraStart.style.display = "none";
+      cameraError.style.display = "flex";
+      cameraErrorText.textContent = text;
+    }
+
+    /* スタンプ & 矢印 */
+    function selectStamp(label) {
+      currentStamp = label;
+      arrowPoint = null;
+      draggingArrow = false;
+      arrowPreview.style.display = "none";
+
+      document.querySelectorAll(".toolButton").forEach(b => b.classList.remove("active"));
+      const target = document.querySelector('[data-stamp="' + label + '"]');
+      if (target) target.classList.add("active");
+
+      stampPreview.textContent = label;
+      stampPreview.style.display = "block";
+      updateStampPreview();
+    }
+
+    function selectArrow() {
+      currentStamp = null;
+      stampPreview.style.display = "none";
+      document.querySelectorAll(".toolButton").forEach(b => b.classList.remove("active"));
+      document.getElementById("arrowButton").classList.add("active");
+
+      if (!arrowPoint) {
+        showMessage("画面をタップして矢印を配置してください");
+      }
+    }
+
+    function updateStampPreview() {
+      if (!currentStamp) {
+        stampPreview.style.display = "none";
+        return;
+      }
+      const m = 14;
+      stampPreview.style.left = "auto";
+      stampPreview.style.right = "auto";
+      stampPreview.style.top = "auto";
+      stampPreview.style.bottom = "auto";
+
+      if (stampPosition === "top-left") { stampPreview.style.left = m + "px"; stampPreview.style.top = m + "px"; }
+      else if (stampPosition === "top-right") { stampPreview.style.right = m + "px"; stampPreview.style.top = m + "px"; }
+      else if (stampPosition === "bottom-left") { stampPreview.style.left = m + "px"; stampPreview.style.bottom = m + "px"; }
+      else if (stampPosition === "bottom-right") { stampPreview.style.right = m + "px"; stampPreview.style.bottom = m + "px"; }
+    }
+
+    function arrowPointerDown(event) {
+      const arrowButton = document.getElementById("arrowButton");
+      if (!arrowButton.classList.contains("active") || !cameraStarted) return;
+
+      event.preventDefault();
+      const point = getStagePoint(event);
+
+      if (arrowPoint) {
+        const dx = point.x - arrowPoint.x;
+        const dy = point.y - arrowPoint.y;
+        if (Math.sqrt(dx * dx + dy * dy) < 80) {
+          draggingArrow = true;
+          try { cameraStage.setPointerCapture(event.pointerId); } catch(e) {}
+          return;
+        }
+      }
+
+      arrowPoint = { x: point.x, y: point.y };
       draggingArrow = true;
       try { cameraStage.setPointerCapture(event.pointerId); } catch(e) {}
-      return;
+      updateArrowPreview();
     }
-  }
 
-  arrowPoint = { x: point.x, y: point.y };
-  draggingArrow = true;
-  try { cameraStage.setPointerCapture(event.pointerId); } catch(e) {}
-  updateArrowPreview();
-}
+    function arrowPointerMove(event) {
+      if (!draggingArrow) return;
+      event.preventDefault();
+      const point = getStagePoint(event);
+      arrowPoint = { x: point.x, y: point.y };
+      updateArrowPreview();
+    }
 
-function arrowPointerMove(event) {
-  if (!draggingArrow) return;
-  event.preventDefault();
-  const point = getStagePoint(event);
-  arrowPoint = { x: point.x, y: point.y };
-  updateArrowPreview();
-}
+    function arrowPointerUp() { draggingArrow = false; }
 
-function arrowPointerUp() { draggingArrow = false; }
+    function getStagePoint(event) {
+      const rect = cameraStage.getBoundingClientRect();
+      return {
+        x: Math.max(0, Math.min(rect.width, event.clientX - rect.left)),
+        y: Math.max(0, Math.min(rect.height, event.clientY - rect.top))
+      };
+    }
 
-function getStagePoint(event) {
-  const rect = cameraStage.getBoundingClientRect();
-  return {
-    x: Math.max(0, Math.min(rect.width, event.clientX - rect.left)),
-    y: Math.max(0, Math.min(rect.height, event.clientY - rect.top))
-  };
-}
+    function updateArrowPreview() {
+      if (!arrowPoint) { arrowPreview.style.display = "none"; return; }
+      arrowPreview.style.display = "block";
+      arrowPreview.style.left = arrowPoint.x + "px";
+      arrowPreview.style.top = arrowPoint.y + "px";
+      arrowPreview.style.transform = "translate(-50%, -50%) scale(" + arrowSize + ")";
+    }
 
-function updateArrowPreview() {
-  if (!arrowPoint) { arrowPreview.style.display = "none"; return; }
-  arrowPreview.style.display = "block";
-  arrowPreview.style.left = arrowPoint.x + "px";
-  arrowPreview.style.top = arrowPoint.y + "px";
-  arrowPreview.style.transform = "translate(-50%, -50%) scale(" + arrowSize + ")";
-}
-
-/* 撮影 & 焼き込み */
-function capturePhoto() {
-  if (!cameraStarted || !video.videoWidth || !video.videoHeight) {
-    showMessage("カメラが準備できていません");
-    return;
-  }
-
-  const width = video.videoWidth;
-  const height = video.videoHeight;
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d");
-
-  ctx.drawImage(video, 0, 0, width, height);
-
-  if (currentStamp) drawStamp(ctx, currentStamp, width, height);
-  if (arrowPoint) {
-    const source = stageToSource(arrowPoint.x, arrowPoint.y);
-    drawArrowOnPhoto(ctx, source.x, source.y, width, height);
-  }
-
-  canvas.toBlob(function(blob) {
-    if (!blob) { showMessage("写真の保存に失敗しました"); return; }
-    photos.unshift({
-      id: Date.now(),
-      blob: blob,
-      stamp: currentStamp || "未指定",
-      created: new Date(),
-      selected: true
-    });
-    showMessage("写真ファイルを保存しました");
-  }, "image/jpeg", 0.92);
-}
-
-function stageToSource(stageX, stageY) {
-  const stageW = cameraStage.clientWidth;
-  const stageH = cameraStage.clientHeight;
-  const sourceW = video.videoWidth;
-  const sourceH = video.videoHeight;
-
-  const scale = Math.max(stageW / sourceW, stageH / sourceH);
-  const renderW = sourceW * scale;
-  const renderH = sourceH * scale;
-  const offsetX = (stageW - renderW) / 2;
-  const offsetY = (stageH - renderH) / 2;
-
-  return {
-    x: Math.max(0, Math.min(sourceW, (stageX - offsetX) / scale)),
-    y: Math.max(0, Math.min(sourceH, (stageY - offsetY) / scale))
-  };
-}
-
-function drawStamp(ctx, label, width, height) {
-  const fontSize = Math.max(36, Math.round(width * 0.035));
-  ctx.font = "bold " + fontSize + "px sans-serif";
-  const pad = fontSize * 0.35;
-  const textWidth = ctx.measureText(label).width;
-  const boxW = textWidth + pad * 2;
-  const boxH = fontSize + pad * 2;
-  const margin = Math.round(width * 0.025);
-
-  let x = margin;
-  let y = margin;
-  if (stampPosition === "top-right") { x = width - boxW - margin; y = margin; }
-  else if (stampPosition === "bottom-left") { x = margin; y = height - boxH - margin; }
-  else if (stampPosition === "bottom-right") { x = width - boxW - margin; y = height - boxH - margin; }
-
-  ctx.fillStyle = "rgba(0,0,0,.75)";
-  ctx.fillRect(x, y, boxW, boxH);
-  ctx.strokeStyle = "#fff";
-  ctx.lineWidth = Math.max(3, width * 0.003);
-  ctx.strokeRect(x, y, boxW, boxH);
-
-  ctx.fillStyle = "#fff";
-  ctx.textBaseline = "middle";
-  ctx.fillText(label, x + pad, y + boxH / 2);
-}
-
-function drawArrowOnPhoto(ctx, x, y, width, height) {
-  const len = Math.min(width, height) * 0.16 * arrowSize;
-  const lw = Math.max(6, width * 0.006) * arrowSize;
-  const startX = x - len;
-  const startY = y + len;
-  const angle = Math.atan2(y - startY, x - startX);
-
-  ctx.save();
-  ctx.strokeStyle = "#ff0000";
-  ctx.fillStyle = "#ff0000";
-  ctx.lineWidth = lw;
-  ctx.lineCap = "round";
-
-  ctx.beginPath();
-  ctx.moveTo(startX, startY);
-  ctx.lineTo(x, y);
-  ctx.stroke();
-
-  const head = len * 0.32;
-  ctx.beginPath();
-  ctx.moveTo(x, y);
-  ctx.lineTo(x - head * Math.cos(angle - Math.PI / 6), y - head * Math.sin(angle - Math.PI / 6));
-  ctx.lineTo(x - head * Math.cos(angle + Math.PI / 6), y - head * Math.sin(angle + Math.PI / 6));
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-}
-
-/* ギャラリー一覧 */
-function openGallery() {
-  gallery.classList.add("show");
-  renderGallery();
-}
-function closeGallery() { gallery.classList.remove("show"); }
-
-function renderGallery() {
-  const list = document.getElementById("galleryList");
-  list.innerHTML = "";
-
-  if (photos.length === 0) {
-    list.innerHTML = `<div style="text-align:center; padding:30px; color:#808080;">ファイルが存在しません。</div>`;
-    return;
-  }
-
-  photos.forEach(photo => {
-    const row = document.createElement("div");
-    row.className = "photo-row";
-
-    const chk = document.createElement("input");
-    chk.type = "checkbox";
-    chk.checked = photo.selected;
-    chk.style.transform = "scale(1.2)";
-    chk.addEventListener("change", () => { photo.selected = chk.checked; });
-
-    const img = document.createElement("img");
-    img.className = "photo-thumb";
-    img.src = URL.createObjectURL(photo.blob);
-
-    const info = document.createElement("div");
-    info.style.flex = "1";
-    info.innerHTML = `<strong>${photo.stamp}</strong><br><small style="color:#666;">${formatTime(photo.created)}</small>`;
-
-    const delBtn = document.createElement("button");
-    delBtn.className = "win-btn";
-    delBtn.textContent = "削除";
-    delBtn.style.padding = "2px 8px";
-    delBtn.addEventListener("click", () => {
-      if (confirm("このファイルを削除しますか？")) {
-        photos = photos.filter(p => p.id !== photo.id);
-        renderGallery();
+    /* 撮影 & 焼き込み */
+    function capturePhoto() {
+      if (!cameraStarted || !video.videoWidth || !video.videoHeight) {
+        showMessage("カメラが準備できていません");
+        return;
       }
-    });
 
-    row.appendChild(chk);
-    row.appendChild(img);
-    row.appendChild(info);
-    row.appendChild(delBtn);
-    list.appendChild(row);
-  });
-}
+      const width = video.videoWidth;
+      const height = video.videoHeight;
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
 
-function formatTime(date) {
-  const d = new Date(date);
-  return d.getHours().toString().padStart(2,"0") + ":" +
-         d.getMinutes().toString().padStart(2,"0") + ":" +
-         d.getSeconds().toString().padStart(2,"0");
-}
+      ctx.drawImage(video, 0, 0, width, height);
 
-/* 設定 */
-function openSettings() { settings.classList.add("show"); updateSettingsUI(); }
-function closeSettings() { settings.classList.remove("show"); }
+      if (currentStamp) drawStamp(ctx, currentStamp, width, height);
+      if (arrowPoint) {
+        const source = stageToSource(arrowPoint.x, arrowPoint.y);
+        drawArrowOnPhoto(ctx, source.x, source.y, width, height);
+      }
 
-function setStampPosition(pos) {
-  stampPosition = pos;
-  localStorage.setItem("stampPosition", pos);
-  updateSettingsUI();
-  updateStampPreview();
-  showMessage("位置設定を更新しました");
-}
+      canvas.toBlob(function(blob) {
+        if (!blob) { showMessage("写真の作成に失敗しました"); return; }
+        photos.unshift({
+          id: Date.now(),
+          blob: blob,
+          stamp: currentStamp || "写真",
+          created: new Date(),
+          selected: true
+        });
+        showMessage("写真を保存しました");
+      }, "image/jpeg", 0.92);
+    }
 
-function setArrowSize(size) {
-  arrowSize = size;
-  localStorage.setItem("arrowSize", String(size));
-  updateSettingsUI();
-  updateArrowPreview();
-  showMessage("矢印サイズを更新しました");
-}
+    function stageToSource(stageX, stageY) {
+      const stageW = cameraStage.clientWidth;
+      const stageH = cameraStage.clientHeight;
+      const sourceW = video.videoWidth;
+      const sourceH = video.videoHeight;
 
-function updateSettingsUI() {
-  document.querySelectorAll("[data-position]").forEach(b => {
-    b.classList.toggle("selected", b.dataset.position === stampPosition);
-  });
-  document.querySelectorAll("[data-arrow-size]").forEach(b => {
-    b.classList.toggle("selected", Number(b.dataset.arrowSize) === arrowSize);
-  });
-}
+      const scale = Math.max(stageW / sourceW, stageH / sourceH);
+      const renderW = sourceW * scale;
+      const renderH = sourceH * scale;
+      const offsetX = (stageW - renderW) / 2;
+      const offsetY = (stageH - renderH) / 2;
 
-/* 共有・送信 */
-async function sendSelectedPhotos() {
-  const selected = photos.filter(p => p.selected);
-  if (selected.length === 0) {
-    showMessage("対象ファイルを選択してください");
-    return;
-  }
+      return {
+        x: Math.max(0, Math.min(sourceW, (stageX - offsetX) / scale)),
+        y: Math.max(0, Math.min(sourceH, (stageY - offsetY) / scale))
+      };
+    }
 
-  const jobNumber = document.getElementById("jobNumber").value.trim();
-  if (!jobNumber) {
-    showMessage("受付番号を入力してください");
-    return;
-  }
+    function drawStamp(ctx, label, width, height) {
+      const fontSize = Math.max(36, Math.round(width * 0.035));
+      ctx.font = "bold " + fontSize + "px sans-serif";
+      const pad = fontSize * 0.35;
+      const textWidth = ctx.measureText(label).width;
+      const boxW = textWidth + pad * 2;
+      const boxH = fontSize + pad * 2;
+      const margin = Math.round(width * 0.025);
 
-  const subject = "受付番号: " + jobNumber + " 現場写真報告分";
-  const files = [];
+      let x = margin;
+      let y = margin;
+      if (stampPosition === "top-right") { x = width - boxW - margin; y = margin; }
+      else if (stampPosition === "bottom-left") { x = margin; y = height - boxH - margin; }
+      else if (stampPosition === "bottom-right") { x = width - boxW - margin; y = height - boxH - margin; }
 
-  for (let i = 0; i < selected.length; i++) {
-    const photo = selected[i];
-    const buffer = await photo.blob.arrayBuffer();
-    files.push(new File([buffer], `現場写真_${jobNumber}_${String(i+1).padStart(2,"0")}.jpg`, { type: "image/jpeg" }));
-  }
+      ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
+      ctx.fillRect(x, y, boxW, boxH);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
+      ctx.lineWidth = Math.max(3, width * 0.003);
+      ctx.strokeRect(x, y, boxW, boxH);
 
-  if (navigator.share && navigator.canShare && navigator.canShare({ files: files })) {
-    try {
-      await navigator.share({ title: subject, text: subject, files: files });
-      showMessage("送信ダイアログを開きました");
-    } catch(e) {}
-    return;
-  }
+      ctx.fillStyle = "#fff";
+      ctx.textBaseline = "middle";
+      ctx.fillText(label, x + pad, y + boxH / 2);
+    }
 
-  showMessage("お使いの環境ではファイル共有機能を利用できません");
-}
+    function drawArrowOnPhoto(ctx, x, y, width, height) {
+      const len = Math.min(width, height) * 0.16 * arrowSize;
+      const lw = Math.max(6, width * 0.006) * arrowSize;
+      const startX = x - len;
+      const startY = y + len;
+      const angle = Math.atan2(y - startY, x - startX);
 
-let messageTimer = null;
-function showMessage(text) {
-  const msg = document.getElementById("message");
-  msg.textContent = text;
-  msg.style.display = "block";
-  clearTimeout(messageTimer);
-  messageTimer = setTimeout(() => { msg.style.display = "none"; }, 2500);
-}
-</script>
+      ctx.save();
+      ctx.strokeStyle = "#f43f5e";
+      ctx.fillStyle = "#f43f5e";
+      ctx.lineWidth = lw;
+      ctx.lineCap = "round";
+
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+
+      const head = len * 0.32;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x - head * Math.cos(angle - Math.PI / 6), y - head * Math.sin(angle - Math.PI / 6));
+      ctx.lineTo(x - head * Math.cos(angle + Math.PI / 6), y - head * Math.sin(angle + Math.PI / 6));
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    /* ギャラリー一覧 */
+    function openGallery() {
+      gallery.classList.add("show");
+      renderGallery();
+    }
+    function closeGallery() { gallery.classList.remove("show"); }
+
+    function renderGallery() {
+      const list = document.getElementById("galleryList");
+      list.innerHTML = "";
+
+      if (photos.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding:40px 10px; color:var(--text-sub);">写真がまだありません。<br>カメラ画面から撮影してください。</div>`;
+        return;
+      }
+
+      photos.forEach(photo => {
+        const row = document.createElement("div");
+        row.className = "gallery-row";
+
+        const chk = document.createElement("input");
+        chk.type = "checkbox";
+        chk.checked = photo.selected;
+        chk.style.width = "22px";
+        chk.style.height = "22px";
+        chk.style.accentColor = "var(--accent)";
+        chk.addEventListener("change", () => { photo.selected = chk.checked; });
+
+        const img = document.createElement("img");
+        img.className = "gallery-thumb";
+        img.src = URL.createObjectURL(photo.blob);
+
+        const info = document.createElement("div");
+        info.style.flex = "1";
+        info.innerHTML = `<strong style="font-size:0.95rem;">${photo.stamp}</strong><br><small style="color:var(--text-sub);">${formatTime(photo.created)}</small>`;
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "icon-btn";
+        delBtn.style.width = "34px";
+        delBtn.style.height = "34px";
+        delBtn.style.color = "var(--danger)";
+        delBtn.textContent = "✕";
+        delBtn.addEventListener("click", () => {
+          if (confirm("この写真を削除しますか？")) {
+            photos = photos.filter(p => p.id !== photo.id);
+            renderGallery();
+          }
+        });
+
+        row.appendChild(chk);
+        row.appendChild(img);
+        row.appendChild(info);
+        row.appendChild(delBtn);
+        list.appendChild(row);
+      });
+    }
+
+    function formatTime(date) {
+      const d = new Date(date);
+      return d.getHours().toString().padStart(2,"0") + ":" +
+             d.getMinutes().toString().padStart(2,"0") + ":" +
+             d.getSeconds().toString().padStart(2,"0");
+    }
+
+    /* 設定 */
+    function openSettings() { settings.classList.add("show"); updateSettingsUI(); }
+    function closeSettings() { settings.classList.remove("show"); }
+
+    function setStampPosition(pos) {
+      stampPosition = pos;
+      localStorage.setItem("stampPosition", pos);
+      updateSettingsUI();
+      updateStampPreview();
+      showMessage("位置設定を更新しました");
+    }
+
+    function setArrowSize(size) {
+      arrowSize = size;
+      localStorage.setItem("arrowSize", String(size));
+      updateSettingsUI();
+      updateArrowPreview();
+      showMessage("矢印サイズを更新しました");
+    }
+
+    function updateSettingsUI() {
+      document.querySelectorAll("[data-position]").forEach(b => {
+        b.classList.toggle("active", b.dataset.position === stampPosition);
+      });
+      document.querySelectorAll("[data-arrow-size]").forEach(b => {
+        b.classList.toggle("active", Number(b.dataset.arrowSize) === arrowSize);
+      });
+    }
+
+    /* 共有・送信 */
+    async function sendSelectedPhotos() {
+      const selected = photos.filter(p => p.selected);
+      if (selected.length === 0) {
+        showMessage("写真を選択してください");
+        return;
+      }
+
+      const jobNumber = document.getElementById("jobNumber").value.trim();
+      if (!jobNumber) {
+        showMessage("受付番号を入力してください");
+        return;
+      }
+
+      const subject = "受付番号: " + jobNumber + " 現場写真報告分";
+      const files = [];
+
+      for (let i = 0; i < selected.length; i++) {
+        const photo = selected[i];
+        const buffer = await photo.blob.arrayBuffer();
+        files.push(new File([buffer], `現場写真_${jobNumber}_${String(i+1).padStart(2,"0")}.jpg`, { type: "image/jpeg" }));
+      }
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: files })) {
+        try {
+          await navigator.share({ title: subject, text: subject, files: files });
+          showMessage("共有ダイアログを開きました");
+        } catch(e) {}
+        return;
+      }
+
+      showMessage("写真共有機能が利用できません");
+    }
+
+    let messageTimer = null;
+    function showMessage(text) {
+      const msg = document.getElementById("message");
+      msg.textContent = text;
+      msg.style.display = "block";
+      clearTimeout(messageTimer);
+      messageTimer = setTimeout(() => { msg.style.display = "none"; }, 2500);
+    }
+  </script>
 </body>
 </html>
