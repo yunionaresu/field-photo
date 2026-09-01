@@ -502,10 +502,30 @@
     <div class="modal-body" id="galleryList"></div>
     
     <div class="modal-bottom">
-      <label style="font-size:0.85rem; font-weight:700; color:var(--text-sub);">受付番号</label>
-      <input id="jobNumber" class="clean-input" type="text" placeholder="例: 26H0043982">
+      <!-- ★ 件名（写真種別）選択タイル -->
+      <div>
+        <label style="font-size:0.85rem; font-weight:700; color:var(--text-sub); display:block; margin-bottom:6px;">
+          メール件名（写真種別）
+        </label>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+          <button class="tile-btn subject-tile active" data-subject="現調写真" style="height:44px;">
+            現調写真
+          </button>
+          <button class="tile-btn subject-tile" data-subject="修理写真" style="height:44px;">
+            修理写真
+          </button>
+        </div>
+      </div>
+
+      <!-- 受付番号入力（本文に入力される） -->
+      <div>
+        <label style="font-size:0.85rem; font-weight:700; color:var(--text-sub); display:block; margin-bottom:6px;">
+          受付番号（本文に入力）
+        </label>
+        <input id="jobNumber" class="clean-input" type="text" placeholder="例: 26H0043982">
+      </div>
       
-      <!-- ★ 全選択/解除・保存・送信ボタングループ -->
+      <!-- 全選択/解除・保存・送信ボタン -->
       <div class="gallery-action-grid">
         <button class="tile-btn" id="btnSelectAllToggle" style="height:50px; font-size:0.85rem;">
           全選択/解除
@@ -664,6 +684,7 @@ let arrowSize = Number(localStorage.getItem("arrowSize") || "1");
 let arrowPoint = null;
 let draggingArrow = false;
 let photos = [];
+let selectedSubject = "現調写真"; // デフォルト件名: 現調写真
 
 window.addEventListener("load", function() {
   setupEvents();
@@ -691,10 +712,21 @@ function setupEvents() {
     if (isSoundEnabled) playClickSound();
   });
 
+  // スタンプ選択
   document.querySelectorAll("[data-stamp]").forEach(btn => {
     btn.addEventListener("click", function() {
       playClickSound();
       selectStamp(this.dataset.stamp);
+    });
+  });
+
+  // 件名（写真種別）選択タイル
+  document.querySelectorAll(".subject-tile").forEach(btn => {
+    btn.addEventListener("click", function() {
+      playClickSound();
+      document.querySelectorAll(".subject-tile").forEach(b => b.classList.remove("active"));
+      this.classList.add("active");
+      selectedSubject = this.dataset.subject;
     });
   });
 
@@ -753,7 +785,7 @@ function setupEvents() {
     sendSelectedPhotos();
   });
 
-  // ★ iPhone写真アプリへの保存ボタン
+  // 保存
   document.getElementById("btnSaveToDevice").addEventListener("click", () => {
     playClickSound();
     savePhotosToDevice();
@@ -1132,7 +1164,7 @@ function updateSettingsUI() {
 }
 
 /* =========================================================
-   ★ iPhone写真アプリへの保存機能
+   iPhone写真アプリへの保存機能
 ========================================================= */
 async function savePhotosToDevice() {
   const selected = photos.filter(p => p.selected);
@@ -1148,7 +1180,6 @@ async function savePhotosToDevice() {
     files.push(new File([buffer], `現場写真_${Date.now()}_${String(i+1).padStart(2,"0")}.jpg`, { type: "image/jpeg" }));
   }
 
-  // iOSの共有シートを開く（「画像を保存」をタップするとカメラロールに保存される）
   if (navigator.share && navigator.canShare && navigator.canShare({ files: files })) {
     try {
       await navigator.share({ files: files });
@@ -1157,7 +1188,6 @@ async function savePhotosToDevice() {
     return;
   }
 
-  // フォールバック（通常ダウンロード）
   selected.forEach((p, idx) => {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(p.blob);
@@ -1168,7 +1198,7 @@ async function savePhotosToDevice() {
 }
 
 /* =========================================================
-   ★ メール・LINE共有送信（受付番号はタイトルのみ）
+   ★ メール・LINE共有送信（件名: 種別 / 本文: 受付番号）
 ========================================================= */
 async function sendSelectedPhotos() {
   const selected = photos.filter(p => p.selected);
@@ -1183,22 +1213,24 @@ async function sendSelectedPhotos() {
     return;
   }
 
-  // ★ メール件名（タイトル欄）にのみ受付番号を設定
-  const emailTitle = "受付番号: " + jobNumber + " 現場写真報告分";
-  const files = [];
+  // ★ 件名（タイトル欄）: 選択された種別（現調写真 または 修理写真）
+  const emailTitle = selectedSubject;
 
+  // ★ 本文欄: 受付番号
+  const emailBody = "受付番号: " + jobNumber;
+
+  const files = [];
   for (let i = 0; i < selected.length; i++) {
     const photo = selected[i];
     const buffer = await photo.blob.arrayBuffer();
-    files.push(new File([buffer], `現場写真_${jobNumber}_${String(i+1).padStart(2,"0")}.jpg`, { type: "image/jpeg" }));
+    files.push(new File([buffer], `${selectedSubject}_${jobNumber}_${String(i+1).padStart(2,"0")}.jpg`, { type: "image/jpeg" }));
   }
 
   if (navigator.share && navigator.canShare && navigator.canShare({ files: files })) {
     try {
-      // ★ text（本文）は空文字にして、本文に受付番号が入らないようにする
       await navigator.share({
         title: emailTitle,
-        text: "",
+        text: emailBody,
         files: files
       });
       showMessage("送信メニューを開きました");
