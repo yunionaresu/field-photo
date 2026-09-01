@@ -303,6 +303,34 @@
       font-weight: 700;
     }
 
+    /* ギャラリーツールバー（一括削除ボタン等） */
+    .gallery-toolbar {
+      padding: 8px 14px;
+      background: #ffffff;
+      border-bottom: 1.5px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-toolbar-danger {
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 6px;
+      background: #fff1f2;
+      border: 1.5px solid #fecdd3;
+      color: var(--brand-red);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-toolbar-danger:active {
+      background: #ffe4e6;
+    }
+
     .modal-body {
       flex: 1;
       overflow-y: auto;
@@ -497,6 +525,21 @@
       <div class="modal-title">📁 撮影済み写真一覧</div>
       <button class="header-tile-btn" id="closeGallery" style="height:34px; padding:0 10px;">閉じる</button>
     </div>
+
+    <!-- ★ 選択削除 ＆ 全削除 ツールバー -->
+    <div class="gallery-toolbar">
+      <div style="font-size:0.85rem; font-weight:700; color:var(--text-sub);">
+        選択中: <strong id="selectedCountText" style="color:var(--brand-red);">0</strong> 枚
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button class="btn-toolbar-danger" id="btnDeleteSelected">
+          🗑 選択削除
+        </button>
+        <button class="btn-toolbar-danger" id="btnDeleteAll" style="background:#fef2f2; border-color:#fca5a5;">
+          ⚠️ 全削除
+        </button>
+      </div>
+    </div>
     
     <div class="modal-body" id="galleryList"></div>
     
@@ -634,7 +677,6 @@ async function dbGetAllPhotos() {
       const request = tx.objectStore(STORE_NAME).getAll();
       request.onsuccess = () => {
         const list = request.result || [];
-        // 作成日時順（新しい順）
         list.sort((a, b) => b.id - a.id);
         resolve(list);
       };
@@ -653,6 +695,17 @@ async function dbDeletePhoto(id) {
     tx.objectStore(STORE_NAME).delete(id);
   } catch (e) {
     console.error("DB Delete Error:", e);
+  }
+}
+
+// 全削除
+async function dbClearAllPhotos() {
+  try {
+    const db = await openDB();
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    tx.objectStore(STORE_NAME).clear();
+  } catch (e) {
+    console.error("DB Clear Error:", e);
   }
 }
 
@@ -735,6 +788,7 @@ const gallery = document.getElementById("gallery");
 const settings = document.getElementById("settings");
 const photoCount = document.getElementById("photoCount");
 const soundToggleBtn = document.getElementById("soundToggleBtn");
+const selectedCountText = document.getElementById("selectedCountText");
 
 let stream = null;
 let cameraStarted = false;
@@ -754,7 +808,6 @@ window.addEventListener("load", async function() {
   cameraStart.style.display = "flex";
   cameraError.style.display = "none";
 
-  // 永続化された写真をIndexedDBから復元
   photos = await dbGetAllPhotos();
   photoCount.textContent = photos.length;
 });
@@ -856,6 +909,41 @@ function setupEvents() {
     const hasUnchecked = photos.some(p => !p.selected);
     photos.forEach(p => p.selected = hasUnchecked);
     renderGallery();
+  });
+
+  // ★ 選択削除
+  document.getElementById("btnDeleteSelected").addEventListener("click", async () => {
+    playClickSound();
+    const selected = photos.filter(p => p.selected);
+    if (selected.length === 0) {
+      showMessage("削除する写真が選択されていません");
+      return;
+    }
+    if (confirm(`選択した ${selected.length} 枚の写真を削除しますか？\n（ブラウザ内から消去されます）`)) {
+      for (const p of selected) {
+        await dbDeletePhoto(p.id);
+      }
+      photos = photos.filter(p => !p.selected);
+      photoCount.textContent = photos.length;
+      renderGallery();
+      showMessage("選択した写真を削除しました");
+    }
+  });
+
+  // ★ 全削除
+  document.getElementById("btnDeleteAll").addEventListener("click", async () => {
+    playClickSound();
+    if (photos.length === 0) {
+      showMessage("写真がありません");
+      return;
+    }
+    if (confirm(`すべての写真（${photos.length}枚）を削除しますか？\n（ブラウザ内から完全に消去されます）`)) {
+      await dbClearAllPhotos();
+      photos = [];
+      photoCount.textContent = 0;
+      renderGallery();
+      showMessage("すべての写真を削除しました");
+    }
   });
 }
 
@@ -1033,7 +1121,6 @@ function capturePhoto() {
       selected: true
     };
 
-    // 配列とIndexedDBの両方に保存（永続化）
     photos.unshift(newPhoto);
     await dbSavePhoto(newPhoto);
 
@@ -1135,12 +1222,20 @@ function drawArrowOnPhoto(ctx, targetX, targetY, width, height) {
 }
 
 /* ギャラリー一覧 */
-function openGallery() { gallery.classList.add("show"); renderGallery(); }
-function closeGallery() { gallery.classList.remove("show"); }
+function openGallery() {
+  gallery.classList.add("show");
+  renderGallery();
+}
+function closeGallery() {
+  gallery.classList.remove("show");
+}
 
 function renderGallery() {
   const list = document.getElementById("galleryList");
   list.innerHTML = "";
+
+  const selectedCount = photos.filter(p => p.selected).length;
+  if (selectedCountText) selectedCountText.textContent = selectedCount;
 
   if (photos.length === 0) {
     list.innerHTML = `<div style="text-align:center; padding:50px 10px; color:var(--text-sub);">撮影された写真がありません</div>`;
@@ -1160,6 +1255,8 @@ function renderGallery() {
     chk.addEventListener("change", () => {
       playClickSound();
       photo.selected = chk.checked;
+      const count = photos.filter(p => p.selected).length;
+      if (selectedCountText) selectedCountText.textContent = count;
     });
 
     const img = document.createElement("img");
@@ -1170,7 +1267,6 @@ function renderGallery() {
     info.style.flex = "1";
     info.innerHTML = `<strong style="font-size:1.05rem;">${photo.stamp}</strong><br><small style="color:var(--text-sub);">${formatTime(photo.created)}</small>`;
 
-    // ★ 削除確認（IndexedDBからも完全に消去）
     const delBtn = document.createElement("button");
     delBtn.className = "header-tile-btn";
     delBtn.textContent = "削除";
@@ -1195,11 +1291,15 @@ function renderGallery() {
   });
 }
 
+/* ★ 日時フォーマット: 月/日 時:分 (例: 09/01 16:41) */
 function formatTime(dateStr) {
   const d = new Date(dateStr);
-  return d.getHours().toString().padStart(2,"0") + ":" +
-         d.getMinutes().toString().padStart(2,"0") + ":" +
-         d.getSeconds().toString().padStart(2,"0");
+  const pad = n => String(n).padStart(2, "0");
+  const month = d.getMonth() + 1;
+  const date = d.getDate();
+  const hours = pad(d.getHours());
+  const minutes = pad(d.getMinutes());
+  return `${month}/${date} ${hours}:${minutes}`;
 }
 
 /* 設定 */
@@ -1263,9 +1363,7 @@ async function savePhotosToDevice() {
   showMessage("ダウンロードを開始しました");
 }
 
-/* =========================================================
-   ★ メール・LINE共有送信（本文に受付番号＋種別）
-========================================================= */
+/* メール・LINE共有送信（本文に受付番号＋種別） */
 async function sendSelectedPhotos() {
   const selected = photos.filter(p => p.selected);
   if (selected.length === 0) {
@@ -1279,7 +1377,6 @@ async function sendSelectedPhotos() {
     return;
   }
 
-  // ★ 本文欄に「受付番号: 26H0043982 現調写真」が入る
   const emailBody = `受付番号: ${jobNumber} ${selectedSubject}`;
 
   const files = [];
