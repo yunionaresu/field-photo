@@ -14,9 +14,9 @@
     :root {
       --bg-base: #f1f5f9;
       --surface: #ffffff;
-      --brand-red: #e60012;       /* リンナイレッド */
+      --brand-red: #e60012;
       --brand-red-dark: #c00010;
-      --text-main: #0f172a;       /* 高コントラスト黒 */
+      --text-main: #0f172a;
       --text-sub: #475569;
       --border-color: #cbd5e1;
       --border-focus: #94a3b8;
@@ -41,7 +41,7 @@
       font-family: var(--font-family);
       overflow: hidden;
       overscroll-behavior: none;
-      font-size: 16px; /* 視認性の高い基本サイズ */
+      font-size: 16px;
     }
 
     body {
@@ -60,13 +60,12 @@
     ========================================================= */
     .header {
       height: 56px;
-      padding: 0 16px;
+      padding: 0 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       background: var(--surface);
       border-bottom: 2px solid #e2e8f0;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
       flex-shrink: 0;
       z-index: 10;
     }
@@ -74,32 +73,34 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 700;
-      letter-spacing: -0.02em;
+      white-space: nowrap;
     }
     .header-logo .red-mark {
       width: 5px;
-      height: 20px;
+      height: 18px;
       background: var(--brand-red);
       border-radius: 2px;
+      flex-shrink: 0;
     }
     .header-actions {
       display: flex;
-      gap: 8px;
+      gap: 6px;
     }
     .header-tile-btn {
       height: 38px;
-      padding: 0 12px;
+      padding: 0 10px;
       border-radius: 8px;
       background: #f8fafc;
       border: 1.5px solid var(--border-color);
       color: var(--text-main);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
+      white-space: nowrap;
       cursor: pointer;
     }
     .header-tile-btn:active {
@@ -113,7 +114,7 @@
       position: relative;
       flex: 1;
       min-height: 0;
-      margin: 10px 12px 6px;
+      margin: 8px 12px 6px;
       background: #000;
       border-radius: 14px;
       overflow: hidden;
@@ -130,7 +131,7 @@
       pointer-events: none;
     }
 
-    /* 起動画面・エラー */
+    /* 起動案内 ＆ エラー画面 */
     #cameraStart, #cameraError {
       position: absolute;
       inset: 0;
@@ -139,7 +140,7 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
-      background: rgba(15, 23, 42, 0.88);
+      background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(4px);
     }
     .card-dialog {
@@ -152,11 +153,11 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      gap: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
     }
 
-    /* スタンプ（視認性バッジ） */
+    /* スタンプ */
     #stampPreview {
       position: absolute;
       z-index: 8;
@@ -203,7 +204,6 @@
       box-shadow: 0 -4px 12px rgba(0,0,0,0.03);
     }
 
-    /* ステータス選択タイル */
     .tiles-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -227,7 +227,6 @@
     .tile-btn:active {
       transform: scale(0.97);
     }
-    /* 選択中（リンナイレッド＋白文字） */
     .tile-btn.active {
       background: var(--brand-red);
       border-color: var(--brand-red);
@@ -235,7 +234,7 @@
       box-shadow: 0 2px 8px rgba(230, 0, 18, 0.35);
     }
 
-    /* シャッターボタン（大型ユニバーサルデザイン） */
+    /* シャッターボタン */
     .shutter-btn {
       width: 100%;
       height: 54px;
@@ -266,7 +265,7 @@
     }
 
     /* =========================================================
-       モーダル（ギャラリー・設定）
+       モーダル
     ========================================================= */
     .modal-overlay {
       position: fixed;
@@ -300,11 +299,8 @@
       background: #f8fafc;
     }
     .modal-title {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .modal-body {
@@ -313,10 +309,9 @@
       padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
 
-    /* ギャラリー写真カード */
     .photo-tile-row {
       display: flex;
       align-items: center;
@@ -343,7 +338,6 @@
       gap: 10px;
     }
 
-    /* 入力フォーム */
     .clean-input {
       width: 100%;
       height: 48px;
@@ -376,6 +370,17 @@
     }
     .btn-action-primary:active {
       background: var(--brand-red-dark);
+    }
+
+    /* トグルスイッチ（設定用） */
+    .setting-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
     }
 
     /* トーストメッセージ */
@@ -412,7 +417,7 @@
       <button class="header-tile-btn" id="galleryButton">
         📁 写真一覧 (<span id="photoCount" style="color:var(--brand-red);">0</span>)
       </button>
-      <button class="header-tile-btn" id="settingsButton" style="padding:0 10px;">
+      <button class="header-tile-btn" id="settingsButton" style="padding:0 10px;" aria-label="設定">
         ⚙️
       </button>
     </div>
@@ -422,27 +427,29 @@
   <main id="cameraStage">
     <video id="video" autoplay playsinline webkit-playsinline muted></video>
 
-    <!-- 起動画面 -->
+    <!-- ★ 起動案内（カメラの使用を許可してください） -->
     <div id="cameraStart">
       <div class="card-dialog">
         <div style="font-size:2.4rem;">📷</div>
-        <h2 style="font-size:1.25rem;">カメラを起動します</h2>
-        <p style="color:var(--text-sub); font-size:0.9rem; line-height:1.5;">
-          現場撮影を開始するには<br>カメラアクセスを許可してください
+        <h2 style="font-size:1.15rem; color:var(--text-main);">カメラの使用を許可してください</h2>
+        <p style="color:var(--text-sub); font-size:0.88rem; line-height:1.5;">
+          現場撮影を開始するには<br>下のボタンを押して許可してください
         </p>
-        <button class="btn-action-primary" id="startCameraButton" style="width:100%; height:46px; margin-top:6px;">
+        <button class="btn-action-primary" id="startCameraButton" style="width:100%; height:48px; margin-top:6px;">
           カメラを起動する
         </button>
       </div>
     </div>
 
     <!-- エラー画面 -->
-    <div id="cameraError">
+    <div id="cameraError" style="display:none;">
       <div class="card-dialog">
         <div style="font-size:2.2rem; color:var(--brand-red);">⚠️</div>
-        <h2 style="font-size:1.15rem; color:var(--brand-red);">カメラ起動エラー</h2>
-        <p id="cameraErrorText" style="color:var(--text-sub); font-size:0.85rem;"></p>
-        <button class="btn-action-primary" id="retryButton" style="width:100%; height:44px;">
+        <h2 style="font-size:1.15rem; color:var(--brand-red);">カメラが起動できません</h2>
+        <p id="cameraErrorText" style="color:var(--text-sub); font-size:0.85rem; line-height:1.5;">
+          iPhoneの「設定」>「Safari」>「カメラ」を「許可」にして再試行してください
+        </p>
+        <button class="btn-action-primary" id="retryButton" style="width:100%; height:44px; margin-top:6px;">
           再試行する
         </button>
       </div>
@@ -451,7 +458,7 @@
     <!-- スタンプ -->
     <div id="stampPreview"></div>
 
-    <!-- ★ 精密SVG矢印（ズレ・分裂ゼロ） -->
+    <!-- ズレない精密SVG矢印 -->
     <div id="arrowPreview">
       <svg viewBox="0 0 100 100" class="arrow-svg">
         <line x1="20" y1="80" x2="72" y2="28" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
@@ -463,7 +470,6 @@
 
   <!-- 操作タイルパネル -->
   <section class="controls-panel">
-    <!-- ステータス切替タイル -->
     <div class="tiles-grid">
       <button class="tile-btn toolButton" data-stamp="作業前">作業前</button>
       <button class="tile-btn toolButton" data-stamp="作業中">作業中</button>
@@ -471,7 +477,6 @@
       <button class="tile-btn toolButton" id="arrowButton">➜ 矢印</button>
     </div>
 
-    <!-- シャッターボタン -->
     <button class="shutter-btn" id="captureButton">
       <div class="red-dot"></div>
       <span>撮影する</span>
@@ -508,11 +513,22 @@
 <section id="settings" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-header">
-      <div class="modal-title">⚙️ スタンプ・矢印の設定</div>
+      <div class="modal-title">⚙️ 各種設定</div>
       <button class="header-tile-btn" id="closeSettings" style="height:34px; padding:0 10px;">✕</button>
     </div>
     
     <div class="modal-body" style="gap:16px;">
+      <!-- ★ 操作音（クリッカー音）ON/OFF -->
+      <div class="setting-toggle-row">
+        <div>
+          <div style="font-weight:700;">操作音（クリッカー音）</div>
+          <div style="font-size:0.8rem; color:var(--text-sub);">ボタンタップ時の効果音</div>
+        </div>
+        <button class="tile-btn" id="soundToggleBtn" style="width:80px; height:40px; font-size:0.9rem;">
+          ON
+        </button>
+      </div>
+
       <div>
         <label style="font-size:0.9rem; font-weight:700; color:var(--text-sub); display:block; margin-bottom:8px;">
           作業状態スタンプの位置
@@ -549,7 +565,72 @@
 
 <script>
 /* =========================================================
-   ロジック部（完全動作版）
+   Web Audio API: クリッカー音 & シャッター音
+========================================================= */
+let audioCtx = null;
+let isSoundEnabled = localStorage.getItem("isSoundEnabled") !== "false"; // 初期値: ON
+
+function initAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+// ボタンタップ時の歯切れの良いクリッカー音
+function playClickSound() {
+  if (!isSoundEnabled) return;
+  try {
+    initAudioContext();
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1200, now);
+    osc.frequency.exponentialRampToValueAtTime(300, now + 0.03);
+
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.03);
+  } catch(e) {}
+}
+
+// 撮影時のシャッター効果音
+function playShutterSound() {
+  if (!isSoundEnabled) return;
+  try {
+    initAudioContext();
+    const now = audioCtx.currentTime;
+    // 2連クリック音（カシャ）
+    [0, 0.04].forEach((delay) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1500, now + delay);
+      osc.frequency.exponentialRampToValueAtTime(400, now + delay + 0.035);
+
+      gain.gain.setValueAtTime(0.3, now + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.035);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.035);
+    });
+  } catch(e) {}
+}
+
+/* =========================================================
+   状態管理
 ========================================================= */
 const video = document.getElementById("video");
 const cameraStage = document.getElementById("cameraStage");
@@ -564,6 +645,7 @@ const arrowPreview = document.getElementById("arrowPreview");
 const gallery = document.getElementById("gallery");
 const settings = document.getElementById("settings");
 const photoCount = document.getElementById("photoCount");
+const soundToggleBtn = document.getElementById("soundToggleBtn");
 
 let stream = null;
 let cameraStarted = false;
@@ -577,48 +659,109 @@ let photos = [];
 window.addEventListener("load", function() {
   setupEvents();
   updateSettingsUI();
+  updateSoundUI();
   updateStampPreview();
+  // 初期画面は必ずカメラ案内画面を表示
   cameraStart.style.display = "flex";
+  cameraError.style.display = "none";
 });
 
 function setupEvents() {
-  startCameraButton.addEventListener("click", startCamera);
-  retryButton.addEventListener("click", startCamera);
+  startCameraButton.addEventListener("click", () => {
+    playClickSound();
+    startCamera();
+  });
+  retryButton.addEventListener("click", () => {
+    playClickSound();
+    startCamera();
+  });
 
+  // 音のトグル
+  soundToggleBtn.addEventListener("click", () => {
+    isSoundEnabled = !isSoundEnabled;
+    localStorage.setItem("isSoundEnabled", String(isSoundEnabled));
+    updateSoundUI();
+    if (isSoundEnabled) playClickSound();
+  });
+
+  // スタンプ選択
   document.querySelectorAll("[data-stamp]").forEach(btn => {
     btn.addEventListener("click", function() {
+      playClickSound();
       selectStamp(this.dataset.stamp);
     });
   });
 
-  document.getElementById("arrowButton").addEventListener("click", selectArrow);
-  captureButton.addEventListener("click", capturePhoto);
+  document.getElementById("arrowButton").addEventListener("click", () => {
+    playClickSound();
+    selectArrow();
+  });
+  
+  captureButton.addEventListener("click", () => {
+    playShutterSound();
+    capturePhoto();
+  });
 
-  document.getElementById("galleryButton").addEventListener("click", openGallery);
-  document.getElementById("closeGallery").addEventListener("click", closeGallery);
-  document.getElementById("settingsButton").addEventListener("click", openSettings);
-  document.getElementById("closeSettings").addEventListener("click", closeSettings);
-  document.getElementById("closeSettingsBtn").addEventListener("click", closeSettings);
+  // ギャラリー・設定開閉
+  document.getElementById("galleryButton").addEventListener("click", () => {
+    playClickSound();
+    openGallery();
+  });
+  document.getElementById("closeGallery").addEventListener("click", () => {
+    playClickSound();
+    closeGallery();
+  });
+  document.getElementById("settingsButton").addEventListener("click", () => {
+    playClickSound();
+    openSettings();
+  });
+  document.getElementById("closeSettings").addEventListener("click", () => {
+    playClickSound();
+    closeSettings();
+  });
+  document.getElementById("closeSettingsBtn").addEventListener("click", () => {
+    playClickSound();
+    closeSettings();
+  });
 
+  // 設定変更
   document.querySelectorAll("[data-position]").forEach(btn => {
-    btn.addEventListener("click", function() { setStampPosition(this.dataset.position); });
+    btn.addEventListener("click", function() {
+      playClickSound();
+      setStampPosition(this.dataset.position);
+    });
   });
   document.querySelectorAll("[data-arrow-size]").forEach(btn => {
-    btn.addEventListener("click", function() { setArrowSize(Number(this.dataset.arrowSize)); });
+    btn.addEventListener("click", function() {
+      playClickSound();
+      setArrowSize(Number(this.dataset.arrowSize));
+    });
   });
 
+  // 矢印ドラッグ操作
   cameraStage.addEventListener("pointerdown", arrowPointerDown);
   cameraStage.addEventListener("pointermove", arrowPointerMove);
   cameraStage.addEventListener("pointerup", arrowPointerUp);
   cameraStage.addEventListener("pointercancel", arrowPointerUp);
 
-  document.getElementById("sendButton").addEventListener("click", sendSelectedPhotos);
+  // 共有
+  document.getElementById("sendButton").addEventListener("click", () => {
+    playClickSound();
+    sendSelectedPhotos();
+  });
 
+  // 全選択トグル
   document.getElementById("btnSelectAllToggle").addEventListener("click", () => {
+    playClickSound();
     const hasUnchecked = photos.some(p => !p.selected);
     photos.forEach(p => p.selected = hasUnchecked);
     renderGallery();
   });
+}
+
+function updateSoundUI() {
+  soundToggleBtn.textContent = isSoundEnabled ? "ON" : "OFF";
+  soundToggleBtn.classList.toggle("active", isSoundEnabled);
 }
 
 /* カメラ起動 */
@@ -652,14 +795,14 @@ async function startCamera() {
     showMessage("カメラが起動しました");
   } catch (error) {
     console.error(error);
-    showCameraError("カメラ起動エラー: " + error.name);
+    showCameraError("カメラのアクセス許可を確認してください。");
   }
 }
 
 function showCameraError(text) {
   cameraStart.style.display = "none";
   cameraError.style.display = "flex";
-  cameraErrorText.textContent = text;
+  if (cameraErrorText) cameraErrorText.textContent = text;
 }
 
 /* スタンプ & 矢印選択 */
@@ -727,6 +870,7 @@ function arrowPointerDown(event) {
   arrowPoint = { x: point.x, y: point.y };
   draggingArrow = true;
   try { cameraStage.setPointerCapture(event.pointerId); } catch(e) {}
+  playClickSound();
   updateArrowPreview();
 }
 
@@ -850,7 +994,7 @@ function drawArrowOnPhoto(ctx, targetX, targetY, width, height) {
   ctx.save();
   ctx.lineCap = "round";
 
-  // 白フチ外枠
+  // 白フチ
   ctx.strokeStyle = "#ffffff";
   ctx.lineWidth = 14 * scale;
   ctx.beginPath();
@@ -907,7 +1051,10 @@ function renderGallery() {
     chk.style.width = "22px";
     chk.style.height = "22px";
     chk.style.accentColor = "var(--brand-red)";
-    chk.addEventListener("change", () => { photo.selected = chk.checked; });
+    chk.addEventListener("change", () => {
+      playClickSound();
+      photo.selected = chk.checked;
+    });
 
     const img = document.createElement("img");
     img.className = "photo-tile-thumb";
@@ -923,6 +1070,7 @@ function renderGallery() {
     delBtn.style.color = "var(--brand-red)";
     delBtn.style.height = "36px";
     delBtn.addEventListener("click", () => {
+      playClickSound();
       if (confirm("この写真を削除しますか？")) {
         photos = photos.filter(p => p.id !== photo.id);
         photoCount.textContent = photos.length;
