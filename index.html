@@ -227,7 +227,6 @@
     .tile-btn:active {
       transform: scale(0.97);
     }
-    /* 選択中（リンナイレッド＋白文字） */
     .tile-btn.active {
       background: var(--brand-red);
       border-color: var(--brand-red);
@@ -416,6 +415,65 @@
       border-radius: 12px;
     }
 
+    /* =========================================================
+       ユーザーズガイド（アコーディオン）スタイル
+    ========================================================= */
+    .guide-section {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .guide-details {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .guide-summary {
+      padding: 12px 14px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+    }
+    .guide-summary::-webkit-details-marker {
+      display: none;
+    }
+    .guide-summary::after {
+      content: "＋";
+      color: var(--brand-red);
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    .guide-details[open] .guide-summary::after {
+      content: "−";
+    }
+    .guide-content {
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      line-height: 1.6;
+      border-top: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+    .guide-content strong {
+      color: var(--text-main);
+    }
+    .guide-content ul {
+      margin-left: 18px;
+      margin-top: 4px;
+      margin-bottom: 6px;
+    }
+    .guide-content li {
+      margin-bottom: 4px;
+    }
+
     /* トーストメッセージ */
     #message {
       position: fixed;
@@ -582,15 +640,15 @@
   </div>
 </section>
 
-<!-- ⚙ 設定モーダル -->
+<!-- ⚙ 設定モーダル（ユーザーズガイド組み込み済み） -->
 <section id="settings" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-header">
-      <div class="modal-title">⚙️ 各種設定</div>
+      <div class="modal-title">⚙️ 各種設定 ＆ ガイド</div>
       <button class="header-tile-btn" id="closeSettings" style="height:34px; padding:0 10px;">✕</button>
     </div>
     
-    <div class="modal-body" style="gap:16px;">
+    <div class="modal-body" style="gap:14px;">
       <!-- 操作音（クリッカー音）ON/OFF -->
       <div class="setting-toggle-row">
         <div>
@@ -602,6 +660,7 @@
         </button>
       </div>
 
+      <!-- スタンプ位置 -->
       <div>
         <label style="font-size:0.9rem; font-weight:700; color:var(--text-sub); display:block; margin-bottom:8px;">
           作業状態スタンプの位置
@@ -614,6 +673,7 @@
         </div>
       </div>
 
+      <!-- 矢印サイズ -->
       <div>
         <label style="font-size:0.9rem; font-weight:700; color:var(--text-sub); display:block; margin-bottom:8px;">
           矢印の大きさ
@@ -624,6 +684,56 @@
           <button class="tile-btn" data-arrow-size="1.4">大</button>
           <button class="tile-btn" data-arrow-size="1.8">特大</button>
         </div>
+      </div>
+
+      <!-- ★ 組み込み型 ユーザーズガイド（アコーディオン） -->
+      <div class="guide-section">
+        <label style="font-size:0.9rem; font-weight:700; color:var(--text-sub); display:block; margin-bottom:4px;">
+          📖 ユーザーズガイド（操作説明書）
+        </label>
+
+        <details class="guide-details">
+          <summary class="guide-summary">1. 撮影の手順（スタンプ・矢印）</summary>
+          <div class="guide-content">
+            <ul>
+              <li><strong>スタンプ選択:</strong> 「作業前」「作業中」「作業後」をタップして選択（赤点灯）。同じボタンをもう一度押すとOFF（未選択）になります。</li>
+              <li><strong>矢印配置:</strong> 「➜ 矢印」をONにして画面の故障箇所をタップすると矢印が配置されます。指でドラッグして移動も可能です。</li>
+              <li><strong>撮影:</strong> 「● 撮影する」を押すと、スタンプと矢印が自動焼き込みされて端末内に保存されます。</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="guide-details">
+          <summary class="guide-summary">2. 写真の保存・メール/LINE送信</summary>
+          <div class="guide-content">
+            <ul>
+              <li><strong>iPhone写真アプリへ保存:</strong> 写真一覧で保存したい写真にチェックを入れ、「📥 保存」をタップ。「○枚の画像を保存」を選ぶとカメラロールに保存されます。</li>
+              <li><strong>報告送信:</strong> 「現調写真」または「修理写真」を選択し、受付番号を入力して「✉ 選択写真を送信」を押します。本文に自動入力された状態でメールやLINEを起動できます。</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="guide-details">
+          <summary class="guide-summary">3. 写真の選択削除・全削除</summary>
+          <div class="guide-content">
+            <ul>
+              <li><strong>個別削除:</strong> 各写真の右側にある「削除」ボタンをタップ。</li>
+              <li><strong>選択削除:</strong> チェックを入れた写真のみを一覧上部の「🗑 選択削除」で一括消去。</li>
+              <li><strong>全削除:</strong> 一覧上部の「⚠️ 全削除」ですべての写真を消去できます。</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="guide-details">
+          <summary class="guide-summary">4. 写真データの保持・注意事項</summary>
+          <div class="guide-content">
+            <ul>
+              <li><strong>データ保持:</strong> 撮影した写真はブラウザ内（IndexedDB）に保存されているため、ブラウザを閉じたりGitHubを更新しても写真は消えません。</li>
+              <li><strong>注意点:</strong> Safariのプライベートブラウズモードや、「履歴とWebサイトデータを消去」を行うとデータが消去されます。通常モードでご使用ください。</li>
+              <li><strong>推奨:</strong> Safariの共有メニューから「ホーム画面に追加」しておくとより安定して使用できます。</li>
+            </ul>
+          </div>
+        </details>
       </div>
     </div>
 
@@ -790,10 +900,8 @@ const selectedCountText = document.getElementById("selectedCountText");
 
 let stream = null;
 let cameraStarted = false;
-
-// ★ スタンプ（作業前・中・後）と矢印の独立状態
-let currentStamp = "作業前"; // 初期値: 作業前
-let isArrowActive = false;   // 初期値: OFF
+let currentStamp = "作業前";
+let isArrowActive = false;
 let stampPosition = localStorage.getItem("stampPosition") || "top-right";
 let arrowSize = Number(localStorage.getItem("arrowSize") || "1");
 let arrowPoint = null;
@@ -830,7 +938,6 @@ function setupEvents() {
     if (isSoundEnabled) playClickSound();
   });
 
-  // ★ スタンプ選択（トグルON/OFF & 排他選択）
   document.querySelectorAll("[data-stamp]").forEach(btn => {
     btn.addEventListener("click", function() {
       playClickSound();
@@ -838,7 +945,6 @@ function setupEvents() {
     });
   });
 
-  // ★ 矢印ボタン（独立トグルON/OFF）
   document.getElementById("arrowButton").addEventListener("click", () => {
     playClickSound();
     toggleArrow();
@@ -994,22 +1100,16 @@ function showCameraError(text) {
   if (cameraErrorText) cameraErrorText.textContent = text;
 }
 
-/* =========================================================
-   ★ スタンプ & 矢印の独立トグル処理（併用可能）
-========================================================= */
+/* スタンプ & 矢印の独立トグル */
 function toggleStamp(label) {
-  // 現在押されているものを再度押したらOFF
   if (currentStamp === label) {
     currentStamp = null;
   } else {
     currentStamp = label;
   }
-
-  // ボタンの見た目を同期
   document.querySelectorAll("[data-stamp]").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.stamp === currentStamp);
   });
-
   updateStampPreview();
 }
 
@@ -1026,7 +1126,6 @@ function toggleArrow() {
       showMessage("画面をタップして矢印を配置してください");
     }
   }
-
   updateArrowPreview();
 }
 
@@ -1103,9 +1202,7 @@ function updateArrowPreview() {
   arrowPreview.style.transform = `translate(-70%, -20%) scale(${arrowSize})`;
 }
 
-/* =========================================================
-   撮影 & Canvas焼き込み（スタンプ＆矢印の併用対応）
-========================================================= */
+/* 撮影 & Canvas焼き込み */
 function capturePhoto() {
   if (!cameraStarted || !video.videoWidth || !video.videoHeight) {
     showMessage("カメラを起動してください");
@@ -1121,12 +1218,10 @@ function capturePhoto() {
 
   ctx.drawImage(video, 0, 0, width, height);
 
-  // ★ スタンプがあれば描画
   if (currentStamp) {
     drawStamp(ctx, currentStamp, width, height);
   }
 
-  // ★ 矢印があれば描画（スタンプと併用可能）
   if (isArrowActive && arrowPoint) {
     const source = stageToSource(arrowPoint.x, arrowPoint.y);
     drawArrowOnPhoto(ctx, source.x, source.y, width, height);
@@ -1244,8 +1339,13 @@ function drawArrowOnPhoto(ctx, targetX, targetY, width, height) {
 }
 
 /* ギャラリー一覧 */
-function openGallery() { gallery.classList.add("show"); renderGallery(); }
-function closeGallery() { gallery.classList.remove("show"); }
+function openGallery() {
+  gallery.classList.add("show");
+  renderGallery();
+}
+function closeGallery() {
+  gallery.classList.remove("show");
+}
 
 function renderGallery() {
   const list = document.getElementById("galleryList");
