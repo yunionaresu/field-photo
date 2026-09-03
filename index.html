@@ -48,6 +48,9 @@
       touch-action: manipulation;
     }
 
+    /* =========================================================
+       レイアウト（縦画面：標準）
+    ========================================================= */
     #app {
       width: 100%;
       height: 100dvh;
@@ -55,11 +58,9 @@
       flex-direction: column;
     }
 
-    /* =========================================================
-       ヘッダー
-    ========================================================= */
+    /* ヘッダー */
     .header {
-      height: 56px;
+      height: 54px;
       padding: 0 14px;
       display: flex;
       align-items: center;
@@ -107,9 +108,7 @@
       background: #e2e8f0;
     }
 
-    /* =========================================================
-       カメラステージ（ファインダー）
-    ========================================================= */
+    /* カメラステージ（ファインダー） */
     #cameraStage {
       position: relative;
       flex: 1;
@@ -190,9 +189,7 @@
       filter: drop-shadow(0 2px 5px rgba(0,0,0,0.6));
     }
 
-    /* =========================================================
-       下部タイルコントロールパネル
-    ========================================================= */
+    /* 下部タイルコントロールパネル（縦画面） */
     .controls-panel {
       background: var(--surface);
       border-top: 2px solid #e2e8f0;
@@ -265,6 +262,65 @@
     }
 
     /* =========================================================
+       ★ 横画面（Landscape）時の専用レイアウト
+    ========================================================= */
+    @media (orientation: landscape) {
+      #app {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+          "header header"
+          "camera controls";
+      }
+
+      .header {
+        grid-area: header;
+        height: 48px;
+        padding-left: calc(14px + env(safe-area-inset-left));
+        padding-right: calc(14px + env(safe-area-inset-right));
+      }
+
+      #cameraStage {
+        grid-area: camera;
+        margin: 6px 8px 8px 12px;
+        margin-left: calc(12px + env(safe-area-inset-left));
+        height: auto;
+      }
+
+      .controls-panel {
+        grid-area: controls;
+        width: 230px;
+        margin: 6px 12px 8px 0;
+        margin-right: calc(12px + env(safe-area-inset-right));
+        padding: 10px;
+        border-top: none;
+        border-left: 2px solid #e2e8f0;
+        border-radius: 14px;
+        box-shadow: var(--card-shadow);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .tiles-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+
+      .tile-btn {
+        height: 44px;
+        font-size: 0.95rem;
+      }
+
+      .shutter-btn {
+        height: 60px;
+        font-size: 1.1rem;
+      }
+    }
+
+    /* =========================================================
        モーダル
     ========================================================= */
     .modal-overlay {
@@ -290,13 +346,14 @@
     }
 
     .modal-header {
-      height: 56px;
+      height: 54px;
       padding: 0 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       border-bottom: 1.5px solid #e2e8f0;
       background: #f8fafc;
+      flex-shrink: 0;
     }
     .modal-title {
       font-size: 1.05rem;
@@ -311,6 +368,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
+      flex-shrink: 0;
     }
     .btn-toolbar-danger {
       height: 34px;
@@ -363,11 +421,12 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      flex-shrink: 0;
     }
 
     .clean-input {
       width: 100%;
-      height: 48px;
+      height: 46px;
       padding: 0 14px;
       border: 2px solid var(--border-color);
       border-radius: 10px;
@@ -387,7 +446,7 @@
       gap: 6px;
     }
     .btn-action-primary {
-      height: 50px;
+      height: 48px;
       background: var(--brand-red);
       color: #ffffff;
       border: none;
@@ -415,11 +474,9 @@
       border-radius: 12px;
     }
 
-    /* =========================================================
-       ユーザーズガイド（アコーディオン）スタイル
-    ========================================================= */
+    /* ユーザーズガイド（アコーディオン） */
     .guide-section {
-      margin-top: 8px;
+      margin-top: 6px;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -514,7 +571,7 @@
     </div>
   </header>
 
-  <!-- カメラファインダー -->
+  <!-- カメラファインダー（横画面では左側に広がる） -->
   <main id="cameraStage">
     <video id="video" autoplay playsinline webkit-playsinline muted></video>
 
@@ -559,7 +616,7 @@
     </div>
   </main>
 
-  <!-- 操作タイルパネル -->
+  <!-- 操作タイルパネル（横画面では右側に配置） -->
   <section class="controls-panel">
     <div class="tiles-grid">
       <button class="tile-btn toolButton active" data-stamp="作業前">作業前</button>
@@ -601,7 +658,6 @@
     <div class="modal-body" id="galleryList"></div>
     
     <div class="modal-bottom">
-      <!-- 写真種別選択タイル -->
       <div>
         <label style="font-size:0.85rem; font-weight:700; color:var(--text-sub); display:block; margin-bottom:6px;">
           写真種別（本文に入力）
@@ -616,7 +672,6 @@
         </div>
       </div>
 
-      <!-- 受付番号入力 -->
       <div>
         <label style="font-size:0.85rem; font-weight:700; color:var(--text-sub); display:block; margin-bottom:6px;">
           受付番号
@@ -624,12 +679,11 @@
         <input id="jobNumber" class="clean-input" type="text" placeholder="例: 26H0043982">
       </div>
       
-      <!-- 全選択/解除・保存・送信ボタン -->
       <div class="gallery-action-grid">
-        <button class="tile-btn" id="btnSelectAllToggle" style="height:50px; font-size:0.85rem;">
+        <button class="tile-btn" id="btnSelectAllToggle" style="height:48px; font-size:0.85rem;">
           全選択/解除
         </button>
-        <button class="tile-btn" id="btnSaveToDevice" style="height:50px; font-size:0.85rem; background:#ffffff;">
+        <button class="tile-btn" id="btnSaveToDevice" style="height:48px; font-size:0.85rem; background:#ffffff;">
           📥 保存
         </button>
         <button class="btn-action-primary" id="sendButton">
@@ -640,7 +694,7 @@
   </div>
 </section>
 
-<!-- ⚙ 設定モーダル（ユーザーズガイド組み込み済み） -->
+<!-- ⚙ 設定モーダル -->
 <section id="settings" class="modal-overlay">
   <div class="modal-card">
     <div class="modal-header">
@@ -686,7 +740,7 @@
         </div>
       </div>
 
-      <!-- ★ 組み込み型 ユーザーズガイド（アコーディオン） -->
+      <!-- ユーザーズガイド（アコーディオン） -->
       <div class="guide-section">
         <label style="font-size:0.9rem; font-weight:700; color:var(--text-sub); display:block; margin-bottom:4px;">
           📖 ユーザーズガイド（操作説明書）
@@ -698,7 +752,7 @@
             <ul>
               <li><strong>スタンプ選択:</strong> 「作業前」「作業中」「作業後」をタップして選択（赤点灯）。同じボタンをもう一度押すとOFF（未選択）になります。</li>
               <li><strong>矢印配置:</strong> 「➜ 矢印」をONにして画面の故障箇所をタップすると矢印が配置されます。指でドラッグして移動も可能です。</li>
-              <li><strong>撮影:</strong> 「● 撮影する」を押すと、スタンプと矢印が自動焼き込みされて端末内に保存されます。</li>
+              <li><strong>撮影:</strong> 「● 撮影する」を押すと、スタンプと矢印が自動焼き込みされて端末内に保存されます。横画面撮影にも対応しています。</li>
             </ul>
           </div>
         </details>
@@ -1339,13 +1393,8 @@ function drawArrowOnPhoto(ctx, targetX, targetY, width, height) {
 }
 
 /* ギャラリー一覧 */
-function openGallery() {
-  gallery.classList.add("show");
-  renderGallery();
-}
-function closeGallery() {
-  gallery.classList.remove("show");
-}
+function openGallery() { gallery.classList.add("show"); renderGallery(); }
+function closeGallery() { gallery.classList.remove("show"); }
 
 function renderGallery() {
   const list = document.getElementById("galleryList");
