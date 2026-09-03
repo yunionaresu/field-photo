@@ -227,6 +227,7 @@
     .tile-btn:active {
       transform: scale(0.97);
     }
+    /* 選択中（リンナイレッド＋白文字） */
     .tile-btn.active {
       background: var(--brand-red);
       border-color: var(--brand-red);
@@ -303,7 +304,6 @@
       font-weight: 700;
     }
 
-    /* ギャラリーツールバー（一括削除ボタン等） */
     .gallery-toolbar {
       padding: 8px 14px;
       background: #ffffff;
@@ -504,7 +504,7 @@
   <!-- 操作タイルパネル -->
   <section class="controls-panel">
     <div class="tiles-grid">
-      <button class="tile-btn toolButton" data-stamp="作業前">作業前</button>
+      <button class="tile-btn toolButton active" data-stamp="作業前">作業前</button>
       <button class="tile-btn toolButton" data-stamp="作業中">作業中</button>
       <button class="tile-btn toolButton" data-stamp="作業後">作業後</button>
       <button class="tile-btn toolButton" id="arrowButton">➜ 矢印</button>
@@ -526,7 +526,6 @@
       <button class="header-tile-btn" id="closeGallery" style="height:34px; padding:0 10px;">閉じる</button>
     </div>
 
-    <!-- ★ 選択削除 ＆ 全削除 ツールバー -->
     <div class="gallery-toolbar">
       <div style="font-size:0.85rem; font-weight:700; color:var(--text-sub);">
         選択中: <strong id="selectedCountText" style="color:var(--brand-red);">0</strong> 枚
@@ -698,7 +697,6 @@ async function dbDeletePhoto(id) {
   }
 }
 
-// 全削除
 async function dbClearAllPhotos() {
   try {
     const db = await openDB();
@@ -792,7 +790,10 @@ const selectedCountText = document.getElementById("selectedCountText");
 
 let stream = null;
 let cameraStarted = false;
-let currentStamp = null;
+
+// ★ スタンプ（作業前・中・後）と矢印の独立状態
+let currentStamp = "作業前"; // 初期値: 作業前
+let isArrowActive = false;   // 初期値: OFF
 let stampPosition = localStorage.getItem("stampPosition") || "top-right";
 let arrowSize = Number(localStorage.getItem("arrowSize") || "1");
 let arrowPoint = null;
@@ -829,11 +830,18 @@ function setupEvents() {
     if (isSoundEnabled) playClickSound();
   });
 
+  // ★ スタンプ選択（トグルON/OFF & 排他選択）
   document.querySelectorAll("[data-stamp]").forEach(btn => {
     btn.addEventListener("click", function() {
       playClickSound();
-      selectStamp(this.dataset.stamp);
+      toggleStamp(this.dataset.stamp);
     });
+  });
+
+  // ★ 矢印ボタン（独立トグルON/OFF）
+  document.getElementById("arrowButton").addEventListener("click", () => {
+    playClickSound();
+    toggleArrow();
   });
 
   document.querySelectorAll(".subject-tile").forEach(btn => {
@@ -843,11 +851,6 @@ function setupEvents() {
       this.classList.add("active");
       selectedSubject = this.dataset.subject;
     });
-  });
-
-  document.getElementById("arrowButton").addEventListener("click", () => {
-    playClickSound();
-    selectArrow();
   });
   
   captureButton.addEventListener("click", () => {
@@ -911,7 +914,6 @@ function setupEvents() {
     renderGallery();
   });
 
-  // ★ 選択削除
   document.getElementById("btnDeleteSelected").addEventListener("click", async () => {
     playClickSound();
     const selected = photos.filter(p => p.selected);
@@ -930,7 +932,6 @@ function setupEvents() {
     }
   });
 
-  // ★ 全削除
   document.getElementById("btnDeleteAll").addEventListener("click", async () => {
     playClickSound();
     if (photos.length === 0) {
@@ -993,31 +994,40 @@ function showCameraError(text) {
   if (cameraErrorText) cameraErrorText.textContent = text;
 }
 
-/* スタンプ & 矢印選択 */
-function selectStamp(label) {
-  currentStamp = label;
-  arrowPoint = null;
-  draggingArrow = false;
-  arrowPreview.style.display = "none";
+/* =========================================================
+   ★ スタンプ & 矢印の独立トグル処理（併用可能）
+========================================================= */
+function toggleStamp(label) {
+  // 現在押されているものを再度押したらOFF
+  if (currentStamp === label) {
+    currentStamp = null;
+  } else {
+    currentStamp = label;
+  }
 
-  document.querySelectorAll(".toolButton").forEach(b => b.classList.remove("active"));
-  const target = document.querySelector('[data-stamp="' + label + '"]');
-  if (target) target.classList.add("active");
+  // ボタンの見た目を同期
+  document.querySelectorAll("[data-stamp]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.stamp === currentStamp);
+  });
 
-  stampPreview.textContent = label;
-  stampPreview.style.display = "block";
   updateStampPreview();
 }
 
-function selectArrow() {
-  currentStamp = null;
-  stampPreview.style.display = "none";
-  document.querySelectorAll(".toolButton").forEach(b => b.classList.remove("active"));
-  document.getElementById("arrowButton").classList.add("active");
+function toggleArrow() {
+  isArrowActive = !isArrowActive;
+  const arrowBtn = document.getElementById("arrowButton");
+  arrowBtn.classList.toggle("active", isArrowActive);
 
-  if (!arrowPoint) {
-    showMessage("画面をタップして矢印を配置してください");
+  if (!isArrowActive) {
+    arrowPoint = null;
+    draggingArrow = false;
+  } else {
+    if (!arrowPoint) {
+      showMessage("画面をタップして矢印を配置してください");
+    }
   }
+
+  updateArrowPreview();
 }
 
 function updateStampPreview() {
@@ -1025,6 +1035,9 @@ function updateStampPreview() {
     stampPreview.style.display = "none";
     return;
   }
+  stampPreview.textContent = currentStamp;
+  stampPreview.style.display = "block";
+
   const m = 12;
   stampPreview.style.left = "auto";
   stampPreview.style.right = "auto";
@@ -1039,8 +1052,7 @@ function updateStampPreview() {
 
 /* 矢印ドラッグ操作 */
 function arrowPointerDown(event) {
-  const arrowButton = document.getElementById("arrowButton");
-  if (!arrowButton.classList.contains("active") || !cameraStarted) return;
+  if (!isArrowActive || !cameraStarted) return;
 
   event.preventDefault();
   const point = getStagePoint(event);
@@ -1081,14 +1093,19 @@ function getStagePoint(event) {
 }
 
 function updateArrowPreview() {
-  if (!arrowPoint) { arrowPreview.style.display = "none"; return; }
+  if (!isArrowActive || !arrowPoint) {
+    arrowPreview.style.display = "none";
+    return;
+  }
   arrowPreview.style.display = "block";
   arrowPreview.style.left = arrowPoint.x + "px";
   arrowPreview.style.top = arrowPoint.y + "px";
   arrowPreview.style.transform = `translate(-70%, -20%) scale(${arrowSize})`;
 }
 
-/* 撮影 & Canvas焼き込み（IndexedDBへ保存） */
+/* =========================================================
+   撮影 & Canvas焼き込み（スタンプ＆矢印の併用対応）
+========================================================= */
 function capturePhoto() {
   if (!cameraStarted || !video.videoWidth || !video.videoHeight) {
     showMessage("カメラを起動してください");
@@ -1104,8 +1121,13 @@ function capturePhoto() {
 
   ctx.drawImage(video, 0, 0, width, height);
 
-  if (currentStamp) drawStamp(ctx, currentStamp, width, height);
-  if (arrowPoint) {
+  // ★ スタンプがあれば描画
+  if (currentStamp) {
+    drawStamp(ctx, currentStamp, width, height);
+  }
+
+  // ★ 矢印があれば描画（スタンプと併用可能）
+  if (isArrowActive && arrowPoint) {
     const source = stageToSource(arrowPoint.x, arrowPoint.y);
     drawArrowOnPhoto(ctx, source.x, source.y, width, height);
   }
@@ -1116,7 +1138,7 @@ function capturePhoto() {
     const newPhoto = {
       id: Date.now(),
       blob: blob,
-      stamp: currentStamp || "写真",
+      stamp: currentStamp || (isArrowActive ? "矢印写真" : "写真"),
       created: new Date().toISOString(),
       selected: true
     };
@@ -1222,13 +1244,8 @@ function drawArrowOnPhoto(ctx, targetX, targetY, width, height) {
 }
 
 /* ギャラリー一覧 */
-function openGallery() {
-  gallery.classList.add("show");
-  renderGallery();
-}
-function closeGallery() {
-  gallery.classList.remove("show");
-}
+function openGallery() { gallery.classList.add("show"); renderGallery(); }
+function closeGallery() { gallery.classList.remove("show"); }
 
 function renderGallery() {
   const list = document.getElementById("galleryList");
@@ -1291,7 +1308,6 @@ function renderGallery() {
   });
 }
 
-/* ★ 日時フォーマット: 月/日 時:分 (例: 09/01 16:41) */
 function formatTime(dateStr) {
   const d = new Date(dateStr);
   const pad = n => String(n).padStart(2, "0");
@@ -1363,7 +1379,7 @@ async function savePhotosToDevice() {
   showMessage("ダウンロードを開始しました");
 }
 
-/* メール・LINE共有送信（本文に受付番号＋種別） */
+/* メール・LINE共有送信 */
 async function sendSelectedPhotos() {
   const selected = photos.filter(p => p.selected);
   if (selected.length === 0) {
